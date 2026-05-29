@@ -299,6 +299,20 @@ textarea.fi{resize:vertical;min-height:70px}
   #main{padding:14px}.kpi-grid{grid-template-columns:1fr 1fr}.fr{grid-template-columns:1fr}
 }
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: #fff !important; overflow: visible !important; height: auto !important; font-size: 12px; }
+  #header, #sidebar, .mn, .btn, .pg-hdr button, .modal-bg, #toast-c, .sb-item, .tabs { display: none !important; }
+  #layout { display: block !important; }
+  #main { overflow: visible !important; padding: 0 !important; max-width: 100% !important; }
+  .card { box-shadow: none !important; border: 1px solid #e2e8f0 !important; break-inside: avoid; margin-bottom: 12px; }
+  .kpi { break-inside: avoid; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pg-hdr { display: flex !important; margin-bottom: 16px; }
+  .print-header { display: block !important; }
+  @page { margin: 18mm 16mm; }
+}
 </style>
 </head>
 <body>
@@ -1160,9 +1174,23 @@ async function renderSidebar() {
     const s=document.createElement('div');
     for (const p of items) {
       const ps=await pipelineStatus(p.id,S.month);
-      const pill=ps.pendente>0?`🔴`:p.situacaoJuridica==='pendente'?'🟡':'';
+      const propVenc=venc.filter(v=>v.prop.id===p.id);
+      const hasUrgente=propVenc.some(v=>v.urgente);
+      const hasVenc=propVenc.length>0;
+      const docsProp=await getPropDocs(p.id);
+      const hasCritDoc=docsProp.some(d=>d.prio==='critico'&&!d.done);
+      // Determinar estado: vermelho > laranja > verde > neutro
+      let badgeStyle='', badgeTitle='';
+      if (hasUrgente || hasCritDoc) {
+        badgeStyle='background:#ef4444;color:#fff'; badgeTitle=hasUrgente?'Vencimento urgente':'Doc crítico pendente';
+      } else if (ps.pendente>0 || hasVenc) {
+        badgeStyle='background:#f59e0b;color:#fff'; badgeTitle=ps.pendente>0?`${ps.pendente} item(ns) pendente(s)`:'Vencimento próximo';
+      } else if (ps.totalItems>0) {
+        badgeStyle='background:#10b981;color:#fff'; badgeTitle='Tudo em dia';
+      }
       const el=document.createElement('div'); el.className='sb-item'+(S.view===p.id?' active':'');
-      el.innerHTML=`<span class="sb-dot dot-${p.mode}"></span><span class="sb-name">${p.name}</span>${pill?`<span class="sb-pill">${pill}</span>`:''}`;
+      const badge=badgeStyle?`<span class="sb-pill" style="${badgeStyle}" title="${badgeTitle}">●</span>`:'';
+      el.innerHTML=`<span class="sb-dot dot-${p.mode}"></span><span class="sb-name">${p.name}</span>${badge}`;
       el.onclick=()=>navigate(p.id); s.appendChild(el);
     }
     sb.appendChild(s);
@@ -2649,7 +2677,18 @@ async function renderRelatorio(main) {
   ph.innerHTML=`<div><div class="pg-title">📋 Relatório Mensal</div><div class="pg-sub">Prestação de contas — ${fmtM(ym)}</div></div>`;
   const btnPrint=document.createElement('button'); btnPrint.className='btn btn-primary';
   btnPrint.innerHTML='🖨️ Imprimir / PDF';
-  btnPrint.onclick=()=>window.print();
+  btnPrint.onclick=()=>{
+    // Injeta cabeçalho temporário visível só no print
+    let ph2=document.getElementById('print-cover');
+    if(!ph2){ph2=document.createElement('div');ph2.id='print-cover';ph2.style.cssText='display:none';document.getElementById('main').prepend(ph2);}
+    ph2.innerHTML=`<div style="border-bottom:2px solid #0f172a;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end">
+      <div><div style="font-size:22px;font-weight:800;color:#0f172a">Brito Empreendimentos</div><div style="font-size:13px;color:#64748b;margin-top:2px">Relatório Mensal — ${fmtM(ym)}</div></div>
+      <div style="font-size:11px;color:#94a3b8;text-align:right">Gerado em ${new Date().toLocaleDateString('pt-BR')}<br>Portfólio de ${PROPS.length} imóveis</div>
+    </div>`;
+    ph2.style.display='block';
+    window.print();
+    setTimeout(()=>{ph2.style.display='none';},500);
+  };
   ph.appendChild(btnPrint); main.appendChild(ph);
 
   const tots = await computeAllTotals(ym);
