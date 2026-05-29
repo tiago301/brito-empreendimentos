@@ -746,7 +746,7 @@ const MONTHS_SH = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let S = { view:'dashboard', month:'', tab:'pipeline' };
+let S = { view:'dashboard', month:'', tab:'pipeline', prevView: null };
 
 // ═══════════════════════════════════════
 // STORAGE
@@ -1169,6 +1169,7 @@ async function renderSidebar() {
 async function navigate(view) {
   const isProp = PROPS.some(p=>p.id===view);
   const changingProp = isProp && S.view !== view;
+  S.prevView = S.view;
   S.view=view;
   if (changingProp) S.tab='ficha';
   else if (!isProp) S.tab='pipeline';
@@ -1360,6 +1361,16 @@ async function renderProperty(main, meta) {
   main.innerHTML='';
   const sj=meta.situacaoJuridica==='ok'?'✓ Documentação OK':meta.situacaoJuridica==='parcial'?'⚠ Documentação parcial':'✕ Documentação pendente';
   const sjc=meta.situacaoJuridica==='ok'?'tg':meta.situacaoJuridica==='parcial'?'':'tr';
+
+  if (S.prevView && S.prevView !== meta.id) {
+    const backBtn = document.createElement('button'); backBtn.className = 'btn btn-ghost btn-sm';
+    backBtn.style.cssText = 'margin-bottom:8px;font-size:12px;color:var(--text-soft)';
+    const backLabels = { documentos:'← Central de Documentos', dashboard:'← Dashboard', pipeline:'← Pipeline Geral', alertas:'← Alertas', ranking:'← Ranking', relatorio:'← Relatório', agenda:'← Agenda' };
+    const backPropMeta = PROPS.find(p => p.id === S.prevView);
+    backBtn.textContent = backLabels[S.prevView] || (backPropMeta ? `← ${backPropMeta.name}` : '← Voltar');
+    backBtn.onclick = async () => { const pv = S.prevView; S.prevView = null; await navigate(pv); };
+    main.appendChild(backBtn);
+  }
 
   const ph=document.createElement('div'); ph.className='prop-hdr';
   ph.innerHTML=`<div class="prop-icon ${meta.mode}">${meta.icon}</div>
@@ -1845,9 +1856,7 @@ async function renderPropDocs(main, meta) {
         if (d.arquivo) {
           const viewBtn = document.createElement('button'); viewBtn.className = 'btn btn-ghost btn-xs'; viewBtn.innerHTML = '👁';
           viewBtn.title = 'Ver arquivo';
-          viewBtn.onclick = () => {
-            const a = document.createElement('a'); a.href = d.arquivo.data; a.target = '_blank'; a.download = d.arquivo.name; a.click();
-          };
+          viewBtn.onclick = () => window.viewDocFile(i);
           actions.appendChild(viewBtn);
         }
 
@@ -1879,6 +1888,31 @@ async function renderPropDocs(main, meta) {
     addSection.appendChild(addRow);
     body.appendChild(addSection);
   }
+
+  window._viewDocData = docs;
+  window.viewDocFile = (idx) => {
+    const d = window._viewDocData[idx];
+    if (!d || !d.arquivo) return;
+    const overlay = document.createElement('div'); overlay.className = 'modal-bg';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border-radius:12px;padding:16px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)';
+    const hdr = document.createElement('div'); hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:16px';
+    const title = document.createElement('div'); title.style.cssText = 'font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px'; title.textContent = d.arquivo.name;
+    const closeBtn = document.createElement('button'); closeBtn.className = 'btn btn-ghost btn-sm'; closeBtn.textContent = '✕ Fechar'; closeBtn.onclick = () => overlay.remove();
+    const dlBtn = document.createElement('button'); dlBtn.className = 'btn btn-outline btn-sm'; dlBtn.textContent = '⬇ Baixar';
+    dlBtn.onclick = () => { const a = document.createElement('a'); a.href = d.arquivo.data; a.download = d.arquivo.name; a.click(); };
+    hdr.append(title, document.createElement('div'));
+    hdr.lastChild.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
+    hdr.lastChild.append(dlBtn, closeBtn);
+    const content = document.createElement('div'); content.style.cssText = 'overflow:auto;flex:1;border-radius:8px;border:1px solid var(--border)';
+    if (d.arquivo.data.startsWith('data:application/pdf') || d.arquivo.data.startsWith('data:application/octet') || d.arquivo.name.toLowerCase().endsWith('.pdf')) {
+      const frame = document.createElement('iframe'); frame.src = d.arquivo.data; frame.style.cssText = 'width:75vw;height:75vh;border:none;border-radius:7px'; content.appendChild(frame);
+    } else {
+      const img = document.createElement('img'); img.src = d.arquivo.data; img.style.cssText = 'max-width:75vw;max-height:75vh;display:block;border-radius:7px'; content.appendChild(img);
+    }
+    box.append(hdr, content); overlay.appendChild(box); document.body.appendChild(overlay);
+  };
 
   redrawDocs();
   main.appendChild(card);
