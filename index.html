@@ -1,0 +1,2799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brito Empreendimentos</title>
+<style>
+:root {
+  --bg:#f4f6fb;--sidebar-bg:#0f172a;--sidebar-w:248px;
+  --accent:#3b82f6;--accent-dark:#1d4ed8;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6;
+  --white:#fff;--border:#e2e8f0;--text:#0f172a;--text-muted:#94a3b8;--text-soft:#64748b;
+  --radius:14px;--radius-sm:8px;--shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);--shadow-md:0 4px 24px rgba(0,0,0,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden;font-size:14px}
+
+/* HEADER */
+#header{height:56px;background:var(--sidebar-bg);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);z-index:200}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-text{color:#fff;font-weight:700;font-size:15px}.logo-text span{color:#60a5fa}
+#hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.hdr-badge{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);padding:3px 10px;border-radius:20px;font-size:12px}
+.hdr-user{width:30px;height:30px;background:linear-gradient(135deg,#10b981,#3b82f6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px}
+
+/* LAYOUT */
+#layout{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);overflow-y:auto;flex-shrink:0;padding:12px 0 24px;border-right:1px solid rgba(255,255,255,.05)}
+#sidebar::-webkit-scrollbar{width:3px}
+#sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.sb-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.25);text-transform:uppercase;padding:10px 16px 4px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13px;border-radius:8px;margin:1px 8px;transition:background .12s,color .12s;user-select:none}
+.sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.sb-item.active{background:rgba(59,130,246,.2);color:#fff;font-weight:600}
+.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sb-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-pill{font-size:10px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);padding:1px 5px;border-radius:10px;flex-shrink:0}
+.sb-div{height:1px;background:rgba(255,255,255,.07);margin:8px 12px}
+.dot-airbnb{background:#ff385c}.dot-imobiliaria{background:#3b82f6}.dot-moradia{background:#10b981}
+.dot-venda{background:#f59e0b}.dot-lazer{background:#64748b}.dot-familia{background:#06b6d4}
+.dot-terreno{background:#84cc16}.dot-comercial{background:#f97316}
+
+/* MAIN */
+#main{flex:1;overflow-y:auto;padding:24px 28px 48px}
+#main::-webkit-scrollbar{width:5px}
+#main::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+/* PAGE HEADER */
+.pg-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.pg-title{font-size:21px;font-weight:800;letter-spacing:-.4px}
+.pg-sub{font-size:13px;color:var(--text-soft);margin-top:2px}
+
+/* MONTH NAV */
+.mn{display:inline-flex;align-items:center;gap:3px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:4px 7px;box-shadow:var(--shadow)}
+.mn button{width:27px;height:27px;border:none;background:none;cursor:pointer;border-radius:6px;font-size:15px;color:var(--text-soft);display:flex;align-items:center;justify-content:center;transition:background .1s}
+.mn button:hover{background:#f1f5f9}
+.mn-lbl{font-size:13px;font-weight:700;color:var(--text);padding:0 8px;min-width:136px;text-align:center}
+.mn-hoje{padding:3px 9px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-left:3px}
+.mn-hoje:hover{background:var(--accent-dark)}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:#fff;border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.green::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.kpi.red::before{background:linear-gradient(90deg,#ef4444,#f87171)}
+.kpi.blue::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.kpi.purple::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.kpi.yellow::before{background:linear-gradient(90deg,#f59e0b,#fcd34d)}
+.kpi-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-soft);margin-bottom:7px}
+.kpi-val{font-size:24px;font-weight:800;letter-spacing:-.4px}
+.kpi-val.green{color:var(--green)}.kpi-val.red{color:var(--red)}.kpi-val.blue{color:var(--accent)}.kpi-val.purple{color:var(--purple)}.kpi-val.yellow{color:var(--yellow)}
+.kpi-sub{font-size:11px;color:var(--text-muted);margin-top:3px}
+
+/* CARD */
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 11px;border-bottom:1px solid #f1f5f9}
+.card-title{font-size:13px;font-weight:700}
+.card-body{padding:14px 18px}
+
+/* ALERTS */
+.alert{display:flex;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:12px;font-size:13px}
+.alert-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.alert-title{font-weight:700;margin-bottom:2px}
+.alert-warn{background:#fffbeb;border:1px solid #fcd34d;color:#92400e}
+.alert-danger{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+.alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.alert-success{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.b-airbnb{background:#ffe4e8;color:#e11d48}.b-imobiliaria{background:#dbeafe;color:#1d4ed8}
+.b-moradia{background:#d1fae5;color:#065f46}.b-venda{background:#fef3c7;color:#b45309}
+.b-lazer{background:#f1f5f9;color:#475569}.b-familia{background:#cffafe;color:#0e7490}
+.b-terreno{background:#ecfccb;color:#3f6212}.b-comercial{background:#ffedd5;color:#c2410c}
+.b-ok{background:#d1fae5;color:#065f46}.b-pend{background:#fee2e2;color:#b91c1c}.b-parcial{background:#fef3c7;color:#b45309}
+.b-pago{background:#d1fae5;color:#065f46}.b-aberto{background:#fee2e2;color:#b91c1c}.b-aguar{background:#fef3c7;color:#b45309}
+.b-entrada{background:#dbeafe;color:#1d4ed8}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:9px 12px;background:#f8fafc;font-weight:700;color:var(--text-soft);border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.clickable:hover td{background:#f8fafc;cursor:pointer}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.tg{color:var(--green);font-weight:700}.tr{color:var(--red);font-weight:700}.tm{color:var(--text-muted)}
+
+/* PIPELINE ROW */
+.pipe-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f8fafc}
+.pipe-row:last-of-type{border-bottom:none}
+.pipe-cat{flex:1;font-size:13px;color:var(--text)}
+.pipe-cat-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+.pipe-val{width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;text-align:right;background:#f8fafc;outline:none;transition:border-color .15s,background .15s}
+.pipe-val:focus{border-color:var(--accent);background:#fff}
+.pipe-venc{width:110px;padding:6px 9px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:#f8fafc;outline:none}
+.pipe-venc:focus{border-color:var(--accent);background:#fff}
+.pipe-actions{display:flex;gap:5px;flex-shrink:0}
+
+/* STATUS BTNS */
+.st-btn{width:28px;height:28px;border-radius:50%;border:2px solid #cbd5e1;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;flex-shrink:0}
+.st-btn.pago{background:var(--green);border-color:var(--green);color:#fff}
+.st-btn.pendente{background:#fef3c7;border-color:var(--yellow);color:var(--yellow)}
+.st-btn:hover{transform:scale(1.08)}
+
+/* UPLOAD CHIP */
+.up-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px dashed #cbd5e1;color:var(--text-soft);background:#f8fafc;transition:all .15s}
+.up-chip:hover{border-color:var(--accent);color:var(--accent);background:#eff6ff}
+.up-chip.has-file{border-style:solid;border-color:var(--green);color:var(--green);background:#f0fdf4}
+
+/* RESULT BAR */
+.result-bar{display:flex;align-items:center;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:10px;padding:14px 18px;gap:0;margin-top:14px}
+.rb-item{flex:1;text-align:center}
+.rb-lbl{font-size:10px;text-transform:uppercase;font-weight:700;letter-spacing:.7px;color:var(--text-soft);margin-bottom:3px}
+.rb-val{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.rb-sep{width:1px;background:#bae6fd;height:36px;flex-shrink:0}
+
+/* FORM */
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.fi{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:#f8fafc;transition:border-color .15s,background .15s}
+.fi:focus{border-color:var(--accent);background:#fff}
+textarea.fi{resize:vertical;min-height:70px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:#f1f5f9;border-radius:10px;padding:3px;margin-bottom:18px;width:fit-content}
+.tab{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text-soft);transition:all .15s;border:none;background:none}
+.tab.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* CHECKLIST */
+.cl{list-style:none}
+.cl li{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.cl li:last-child{border-bottom:none}
+.ck{width:19px;height:19px;border-radius:5px;border:2px solid #cbd5e1;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;transition:all .15s}
+.ck.done{background:var(--green);border-color:var(--green);color:#fff}
+.ck-lbl{flex:1}.ck-lbl.crossed{text-decoration:line-through;color:var(--text-muted)}
+
+/* PROGRESS */
+.prog-bg{background:#e2e8f0;height:5px;border-radius:3px;overflow:hidden;margin-top:5px}
+.prog-fill{height:100%;border-radius:3px;transition:width .4s}
+.prog-fill.green{background:var(--green)}.prog-fill.yellow{background:var(--yellow)}.prog-fill.red{background:var(--red)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-dark)}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#059669}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#dc2626}
+.btn-outline{background:#fff;color:var(--text-soft);border:1px solid var(--border)}.btn-outline:hover{background:#f8fafc}
+.btn-ghost{background:transparent;color:var(--text-soft);border:none;padding:5px 9px}.btn-ghost:hover{background:#f1f5f9}
+.btn-sm{padding:4px 9px;font-size:12px}.btn-xs{padding:2px 7px;font-size:11px}
+
+/* PROP HEADER */
+.prop-hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;padding:18px 20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border)}
+.prop-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.prop-icon.airbnb{background:#ffe4e8}.prop-icon.imobiliaria{background:#dbeafe}.prop-icon.moradia{background:#d1fae5}
+.prop-icon.venda{background:#fef3c7}.prop-icon.lazer{background:#f1f5f9}.prop-icon.familia{background:#cffafe}
+.prop-icon.terreno{background:#ecfccb}.prop-icon.comercial{background:#ffedd5}
+.prop-name{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.prop-loc{font-size:12px;color:var(--text-soft);margin-top:2px}
+
+/* HIST TABLE */
+.htbl{width:100%;border-collapse:collapse;font-size:13px}
+.htbl th{padding:8px 11px;background:#f8fafc;text-align:right;font-weight:700;color:var(--text-soft);font-size:11px;border-bottom:1px solid var(--border)}
+.htbl th:first-child{text-align:left}
+.htbl td{padding:8px 11px;border-bottom:1px solid #f8fafc;text-align:right;font-variant-numeric:tabular-nums}
+.htbl td:first-child{text-align:left}
+
+/* VENDA DRE */
+.dre-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.dre-row.total{font-weight:700;font-size:15px;border-top:2px solid var(--border);border-bottom:none;padding-top:12px;margin-top:4px}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:var(--radius);padding:22px;width:440px;max-width:92vw;box-shadow:var(--shadow-md)}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:16px}
+
+/* TOAST */
+#toast-c{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px}
+.toast{background:#1e293b;color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:var(--shadow-md);animation:tin .22s ease;display:flex;align-items:center;gap:7px;min-width:210px}
+.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--accent)}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tout{from{opacity:1}to{opacity:0;transform:translateY(7px)}}
+.toast.out{animation:tout .22s ease forwards}
+
+/* CHART */
+.chart-wrap{position:relative;height:250px}
+
+/* UPLOAD AREA */
+.up-area{border:2px dashed #cbd5e1;border-radius:var(--radius);padding:36px;text-align:center;cursor:pointer;transition:all .2s;background:#fff}
+.up-area:hover,.up-area.over{border-color:var(--accent);background:#eff6ff}
+
+/* STOR BAR */
+.stor-bg{background:#e2e8f0;height:7px;border-radius:3px;overflow:hidden;margin-top:5px}
+.stor-fill{height:100%;background:var(--accent);border-radius:3px}
+
+/* CONCIL */
+.concil-badge{background:#d1fae5;color:#065f46;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700}
+
+/* EMPTY */
+.empty{text-align:center;padding:44px 24px;color:var(--text-muted)}
+.empty .ei{font-size:38px;margin-bottom:10px}
+.empty .et{font-size:14px;font-weight:700;color:var(--text-soft)}
+
+/* INLINE SELECT */
+.isel{padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:#fff;cursor:pointer}
+
+/* DOC CHECKLIST */
+.doc-cat-hdr{display:flex;align-items:center;gap:8px;padding:10px 0 6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text-soft);border-bottom:1px solid var(--border);margin-bottom:4px}
+.doc-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc}
+.doc-row:last-child{border-bottom:none}
+.doc-ck{width:20px;height:20px;border-radius:5px;border:2px solid #cbd5e1;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;margin-top:1px;transition:all .15s}
+.doc-ck.done{background:var(--green);border-color:var(--green);color:#fff}
+.doc-info{flex:1;min-width:0}
+.doc-lbl{font-size:13px;font-weight:600;cursor:pointer;transition:color .1s}
+.doc-lbl.crossed{text-decoration:line-through;color:var(--text-muted)}
+.doc-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.prio-critico{background:#fee2e2;color:#b91c1c;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700}
+.prio-importante{background:#fef3c7;color:#b45309;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700}
+.prio-normal{background:#f1f5f9;color:#475569;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700}
+.doc-val-inp{width:130px;padding:3px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:#f8fafc}
+.doc-obs-inp{width:200px;padding:3px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:#f8fafc}
+.doc-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+
+/* CONTATOS */
+.contact-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc}
+.contact-row:last-child{border-bottom:none}
+.contact-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:#f1f5f9}
+.contact-info{flex:1}
+.contact-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.contact-name{font-size:13px;font-weight:600;color:var(--text)}
+.contact-detail{font-size:12px;color:var(--text-soft);margin-top:1px}
+
+/* RESERVAS AIRBNB */
+.reserva-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc}
+.reserva-row:last-child{border-bottom:none}
+.reserva-plat{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.plat-airbnb{background:#ffe4e8}.plat-booking{background:#dbeafe}.plat-direto{background:#d1fae5}
+
+/* RELATÓRIO */
+.rel-section{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.rel-section:last-child{border-bottom:none}
+.rel-section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--text-soft);margin-bottom:10px}
+.rel-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid #f8fafc}
+.rel-row:last-child{border-bottom:none}
+.rel-total{font-weight:700;font-size:14px;border-top:2px solid var(--border);padding-top:10px;margin-top:6px}
+
+/* RANKING */
+.rank-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #f8fafc}
+.rank-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;background:#f1f5f9;color:var(--text-soft)}
+.rank-num.gold{background:#fef3c7;color:#b45309}
+.rank-num.silver{background:#f1f5f9;color:#475569}
+.rank-num.bronze{background:#ffedd5;color:#c2410c}
+
+/* FUNIL VENDA */
+.funil-stage{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-bottom:6px;font-size:13px;cursor:pointer;transition:background .1s}
+.funil-stage:hover{background:#f8fafc}
+.funil-stage.active-stage{background:#eff6ff;border:1px solid #bfdbfe}
+
+/* SEGURO */
+.seguro-card{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+
+/* ALERT VENCIMENTO */
+.alert-venc-list{display:flex;flex-direction:column;gap:6px}
+.alert-venc-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;font-size:12px}
+.alert-venc-item.urgente{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+.alert-venc-item.aviso{background:#fffbeb;border:1px solid #fcd34d;color:#92400e}
+.alert-venc-item.ok{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+
+/* REAJUSTE */
+.reaj-badge{background:#f0fdf4;border:1px solid #86efac;color:#065f46;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.reaj-badge.vencendo{background:#fffbeb;border-color:#fcd34d;color:#92400e}
+.reaj-badge.vencido{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+
+@media(max-width:768px){
+  #sidebar{width:52px}.sb-name,.sb-pill,.sb-lbl{display:none}
+  #main{padding:14px}.kpi-grid{grid-template-columns:1fr 1fr}.fr{grid-template-columns:1fr}
+}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo-icon">🏢</div>
+  <div class="logo-text" style="margin-left:8px">Brito <span>Empreendimentos</span></div>
+  <div id="hdr-right">
+    <div class="hdr-badge" id="hdr-month"></div>
+    <div class="hdr-user">TB</div>
+  </div>
+</div>
+
+<div id="layout">
+  <nav id="sidebar"></nav>
+  <main id="main"></main>
+</div>
+
+<div id="toast-c"></div>
+
+<!-- Chart.js removido: usando SVG inline -->
+<script>
+// ═══════════════════════════════════════
+// IMÓVEIS — 15 propriedades
+// ═══════════════════════════════════════
+const PROPS = [
+  { id:'ap_gramado', name:'Ap Gramado', icon:'🏔️', mode:'airbnb', city:'Gramado', state:'RS',
+    valorImovel:350000, custoAquisicao:320000, iptu:10534,
+    situacaoJuridica:'parcial',
+    obs:'Empreendimento de cotas — verificar como funciona regularmente',
+    custos:[
+      {id:'condominio',    label:'Condomínio',       tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'adm_airbnb',   label:'Taxa Airbnb/ADM',   tipo:'saida', recorrente:true, vencDia:20, valor:0},
+      {id:'energia',      label:'Energia',            tipo:'saida', recorrente:true, vencDia:15, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',   tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',         tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[
+      {id:'airbnb',       label:'Receita Airbnb',     tipo:'entrada', recorrente:false, valor:0},
+    ],
+    docs:[
+      // BASE
+      {id:'matricula',   cat:'Base',         label:'Matrícula atualizada',           prio:'critico', done:false},
+      {id:'escritura',   cat:'Base',         label:'Escritura / Contrato de cotas',  prio:'critico', done:false},
+      {id:'iptu_carne',  cat:'Base',         label:'Carnê IPTU do ano',              prio:'importante', done:false},
+      {id:'cnd_mun',     cat:'Base',         label:'CND Municipal',                  prio:'importante', done:false},
+      // CONDOMÍNIO
+      {id:'conv_cond',   cat:'Condomínio',   label:'Convenção do condomínio',        prio:'importante', done:false},
+      {id:'reg_interno', cat:'Condomínio',   label:'Regulamento interno',            prio:'normal', done:false},
+      {id:'quit_cond',   cat:'Condomínio',   label:'Declaração de quitação condominial', prio:'critico', done:false},
+      // AIRBNB / OPERAÇÃO
+      {id:'contratos_arbnb', cat:'Operação', label:'Contratos Airbnb / ADM',        prio:'importante', done:false},
+      {id:'comprov_cotas',   cat:'Operação', label:'Comprovantes de pagamento das cotas', prio:'normal', done:false},
+    ]
+  },
+  { id:'ap_juveve', name:'Ap Juvevê', icon:'🏙️', mode:'imobiliaria', city:'Curitiba', state:'PR',
+    valorImovel:280000, custoAquisicao:210000, iptu:1800,
+    situacaoJuridica:'pendente',
+    obs:'Arrematado em leilão. Aguardando transferência no cartório. Alugado pelo Quinto Andar.',
+    custos:[
+      {id:'adm_imob',     label:'Taxa Imobiliária (já descontada)', tipo:'info', recorrente:true, vencDia:null, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[
+      {id:'aluguel',      label:'Aluguel líquido (já descontado imob+cond)', tipo:'entrada', recorrente:true, valor:0},
+    ],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',           prio:'critico', done:false},
+      {id:'carta_arremat', cat:'Base',       label:'Carta de arrematação',           prio:'critico', done:false},
+      {id:'certidao_cart', cat:'Base',       label:'Certidão do cartório (transferência)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',              prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                  prio:'importante', done:false},
+      // CONDOMÍNIO
+      {id:'conv_cond',     cat:'Condomínio', label:'Convenção do condomínio',        prio:'normal', done:false},
+      {id:'quit_cond',     cat:'Condomínio', label:'Declaração de quitação condominial', prio:'critico', done:false},
+      // LOCAÇÃO
+      {id:'contrato_loc',  cat:'Locação',    label:'Contrato de locação (Quinto Andar)', prio:'critico', done:false},
+      {id:'vistoria_ent',  cat:'Locação',    label:'Vistoria de entrada assinada',   prio:'importante', done:false},
+      {id:'extratos_rep',  cat:'Locação',    label:'Últimos 3 extratos do repasse',  prio:'normal', done:false},
+    ]
+  },
+  { id:'ap_meia_praia', name:'Ap Meia Praia', icon:'🏖️', mode:'airbnb', city:'Itapema', state:'SC',
+    valorImovel:420000, custoAquisicao:380000, iptu:2200,
+    situacaoJuridica:'parcial',
+    obs:'Pagando balões até dez/2028. Contrato de compra e venda em mãos.',
+    custos:[
+      {id:'condominio',   label:'Condomínio',        tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'internet',     label:'Internet',           tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'energia',      label:'Energia',            tipo:'saida', recorrente:true, vencDia:15, valor:0},
+      {id:'gas',          label:'Gás',                tipo:'saida', recorrente:true, vencDia:20, valor:0},
+      {id:'limpeza',      label:'Limpeza (hóspedes)', tipo:'saida', recorrente:false, vencDia:null, valor:0},
+      {id:'adm_airbnb',   label:'Taxa Airbnb/ADM',    tipo:'saida', recorrente:true, vencDia:20, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',   tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'balao',        label:'Balão de pagamento', tipo:'saida', recorrente:false, vencDia:null, valor:0},
+      {id:'manutencao',   label:'Manutenção',         tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[
+      {id:'airbnb',       label:'Receita Airbnb',    tipo:'entrada', recorrente:false, valor:0},
+    ],
+    baloes:[{mes:'2026-06',valor:75000},{mes:'2026-12',valor:75000},{mes:'2027-06',valor:75000},{mes:'2027-12',valor:75000},{mes:'2028-06',valor:75000},{mes:'2028-12',valor:75000}],
+    docs:[
+      // BASE
+      {id:'contrato_cv',   cat:'Base',       label:'Contrato de compra e venda (original)', prio:'critico', done:false},
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',                prio:'importante', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura definitiva (após quitação)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                   prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                       prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                           prio:'importante', done:false},
+      // CONDOMÍNIO
+      {id:'conv_cond',     cat:'Condomínio', label:'Convenção do condomínio',             prio:'normal', done:false},
+      {id:'quit_cond',     cat:'Condomínio', label:'Declaração de quitação condominial',  prio:'critico', done:false},
+      // FINANCIAMENTO / BALÕES
+      {id:'cronograma',    cat:'Financiamento', label:'Cronograma de balões',             prio:'critico', done:false},
+      {id:'comprov_baloes',cat:'Financiamento', label:'Comprovantes de balões pagos',     prio:'critico', done:false},
+      // AIRBNB / OPERAÇÃO
+      {id:'contratos_arbnb', cat:'Operação', label:'Contratos Airbnb / ADM',             prio:'importante', done:false},
+      {id:'reg_condominio',  cat:'Operação', label:'Regulamento do condomínio',           prio:'normal', done:false},
+    ]
+  },
+  { id:'ap_the_square', name:'Ap The Square', icon:'🏢', mode:'imobiliaria', city:'Curitiba', state:'PR',
+    valorImovel:310000, custoAquisicao:280000, iptu:2000,
+    situacaoJuridica:'ok',
+    obs:'No meu nome. Alugado via imobiliária.',
+    custos:[
+      {id:'adm_imob',     label:'Taxa imobiliária (já descontada)', tipo:'info', recorrente:true, vencDia:null, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[
+      {id:'aluguel',      label:'Aluguel líquido',   tipo:'entrada', recorrente:true, valor:0},
+    ],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'normal', done:true},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública',                 prio:'critico', done:true},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:true},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'importante', done:true},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'importante', done:true},
+      // CONDOMÍNIO
+      {id:'conv_cond',     cat:'Condomínio', label:'Convenção do condomínio',           prio:'normal', done:true},
+      {id:'quit_cond',     cat:'Condomínio', label:'Declaração de quitação condominial', prio:'critico', done:false},
+      // LOCAÇÃO
+      {id:'contrato_loc',  cat:'Locação',    label:'Contrato de locação vigente',       prio:'critico', done:true},
+      {id:'contrato_imob', cat:'Locação',    label:'Contrato com imobiliária',          prio:'critico', done:true},
+      {id:'vistoria_ent',  cat:'Locação',    label:'Vistoria de entrada assinada',      prio:'importante', done:true},
+      {id:'extratos_rep',  cat:'Locação',    label:'Últimos 3 extratos do repasse',     prio:'normal', done:false},
+    ]
+  },
+  { id:'ap_arvoredo', name:'Ap Arvoredo', icon:'🌿', mode:'imobiliaria', city:'Curitiba', state:'PR',
+    valorImovel:250000, custoAquisicao:220000, iptu:1500,
+    situacaoJuridica:'ok',
+    obs:'Alugado via imobiliária.',
+    custos:[
+      {id:'adm_imob',     label:'Taxa imobiliária (já descontada)', tipo:'info', recorrente:true, vencDia:null, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[
+      {id:'aluguel',      label:'Aluguel líquido',   tipo:'entrada', recorrente:true, valor:0},
+    ],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública',                 prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'importante', done:false},
+      // CONDOMÍNIO
+      {id:'conv_cond',     cat:'Condomínio', label:'Convenção do condomínio',           prio:'normal', done:false},
+      {id:'quit_cond',     cat:'Condomínio', label:'Declaração de quitação condominial', prio:'critico', done:false},
+      // LOCAÇÃO
+      {id:'contrato_loc',  cat:'Locação',    label:'Contrato de locação vigente',       prio:'critico', done:false},
+      {id:'contrato_imob', cat:'Locação',    label:'Contrato com imobiliária',          prio:'critico', done:false},
+      {id:'vistoria_ent',  cat:'Locação',    label:'Vistoria de entrada assinada',      prio:'importante', done:false},
+      {id:'extratos_rep',  cat:'Locação',    label:'Últimos 3 extratos do repasse',     prio:'normal', done:false},
+    ]
+  },
+  { id:'sala_joinville', name:'Sala Joinville', icon:'🏪', mode:'comercial', city:'Joinville', state:'SC',
+    valorImovel:180000, custoAquisicao:160000, iptu:1200,
+    situacaoJuridica:'ok',
+    obs:'Vaga, aguardando locatário.',
+    custos:[
+      {id:'condominio',   label:'Condomínio',        tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[
+      {id:'aluguel',      label:'Aluguel',           tipo:'entrada', recorrente:false, valor:0},
+    ],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública',                 prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'importante', done:false},
+      // CONDOMÍNIO (sala comercial)
+      {id:'conv_cond',     cat:'Condomínio', label:'Convenção / regulamento do condomínio', prio:'normal', done:false},
+      {id:'quit_cond',     cat:'Condomínio', label:'Declaração de quitação condominial', prio:'critico', done:false},
+      // LOCAÇÃO (vaga, mas preparar)
+      {id:'minuta_loc',    cat:'Locação',    label:'Minuta de contrato de locação',     prio:'normal', done:false},
+    ]
+  },
+  { id:'casa_mirabelle', name:'Casa Mirabelle', icon:'🏡', mode:'moradia', city:'Curitiba', state:'PR',
+    valorImovel:580000, custoAquisicao:520000, iptu:3600,
+    situacaoJuridica:'parcial',
+    obs:'Moradia principal. Parcelas direto com proprietário até julho/2027.',
+    custos:[
+      {id:'parcela_prop',  label:'Parcela proprietário', tipo:'saida', recorrente:true, vencDia:5, valor:0},
+      {id:'condominio',    label:'Condomínio',            tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'agua',          label:'Água',                  tipo:'saida', recorrente:true, vencDia:15, valor:0},
+      {id:'energia',       label:'Energia',               tipo:'saida', recorrente:true, vencDia:15, valor:0},
+      {id:'gas',           label:'Gás',                   tipo:'saida', recorrente:true, vencDia:20, valor:0},
+      {id:'internet',      label:'Internet',              tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'jardineiro',    label:'Jardineiro',            tipo:'saida', recorrente:true, vencDia:5, valor:0},
+      {id:'iptu',          label:'IPTU (parcelado)',      tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',    label:'Manutenção',            tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[],
+    docs:[
+      // BASE
+      {id:'contrato_cv',   cat:'Base',       label:'Contrato de compra parcelada (original)', prio:'critico', done:false},
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'importante', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura definitiva (após quitação jul/2027)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'importante', done:false},
+      // CONDOMÍNIO
+      {id:'conv_cond',     cat:'Condomínio', label:'Convenção do condomínio',           prio:'normal', done:false},
+      {id:'quit_cond',     cat:'Condomínio', label:'Declaração de quitação condominial', prio:'critico', done:false},
+      // FINANCIAMENTO
+      {id:'cronograma',    cat:'Financiamento', label:'Cronograma de parcelas com proprietário', prio:'critico', done:false},
+      {id:'comprov_parc',  cat:'Financiamento', label:'Comprovantes de parcelas pagas', prio:'critico', done:false},
+    ]
+  },
+  { id:'sitio_tatu', name:'Sítio Tatú do Bem', icon:'🌾', mode:'lazer', city:'Campo Largo', state:'PR',
+    valorImovel:350000, custoAquisicao:280000, iptu:1200,
+    situacaoJuridica:'parcial',
+    obs:'Quitado, no meu nome. Falta lavrar a escritura.',
+    custos:[
+      {id:'internet',     label:'Internet',          tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública (pendente lavratura)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU / ITR do ano',           prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal / Federal',           prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se (benfeitorias, se houver)', prio:'normal', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção (galpão/sede)', prio:'importante', done:false},
+      {id:'planta',        cat:'Base',       label:'Planta baixa aprovada',             prio:'normal', done:false},
+      // RURAL
+      {id:'ccir',          cat:'Rural',      label:'CCIR — Certificado de Cadastro de Imóvel Rural', prio:'critico', done:false},
+      {id:'itr',           cat:'Rural',      label:'ITR — Imposto Territorial Rural quitado', prio:'critico', done:false},
+      {id:'georef',        cat:'Rural',      label:'Georreferenciamento',               prio:'importante', done:false},
+    ]
+  },
+  { id:'chacara_brito', name:'Chácara Brito', icon:'🌳', mode:'lazer', city:'Colombo', state:'PR',
+    valorImovel:280000, custoAquisicao:200000, iptu:900,
+    situacaoJuridica:'parcial',
+    obs:'Meu pai usa. Documentação existe mas está com ele.',
+    custos:[
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública (localizar com pai)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU / ITR — débitos em dia', prio:'critico', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se (benfeitorias)',           prio:'normal', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção (sede/benfeitorias)', prio:'importante', done:false},
+      // RURAL
+      {id:'ccir',          cat:'Rural',      label:'CCIR — Certificado de Cadastro de Imóvel Rural', prio:'critico', done:false},
+      {id:'itr',           cat:'Rural',      label:'ITR — Imposto Territorial Rural',   prio:'critico', done:false},
+      {id:'georef',        cat:'Rural',      label:'Georreferenciamento',               prio:'importante', done:false},
+    ]
+  },
+  { id:'casa_mae', name:'Casa da Mãe', icon:'🏠', mode:'familia', city:'Curitiba', state:'PR',
+    valorImovel:220000, custoAquisicao:180000, iptu:1000,
+    situacaoJuridica:'pendente',
+    obs:'Quitado. Precisa localizar os documentos.',
+    custos:[
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública (localizar)',      prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'normal', done:false},
+      {id:'quit_comprov',  cat:'Base',       label:'Comprovante de quitação (se houver financiamento)', prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'importante', done:false},
+    ]
+  },
+  { id:'casa_timbo1', name:'Casa Timbó 1', icon:'🏘️', mode:'venda', city:'Timbó', state:'SC',
+    valorImovel:180000, custoAquisicao:140000, iptu:800,
+    situacaoJuridica:'ok',
+    obs:'À venda. Documentação OK.',
+    custos:[
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[{id:'venda', label:'Valor de venda', tipo:'entrada', recorrente:false, valor:0}],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública',                 prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'critico', done:false},
+      {id:'planta',        cat:'Base',       label:'Planta baixa aprovada',             prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'critico', done:false},
+      {id:'art_rrt',       cat:'Base',       label:'ART / RRT do projeto',              prio:'normal', done:false},
+      // VENDA
+      {id:'cnd_federal',   cat:'Venda',      label:'CND Federal',                       prio:'critico', done:false},
+      {id:'cnd_estadual',  cat:'Venda',      label:'CND Estadual',                      prio:'critico', done:false},
+      {id:'cert_trabalhista', cat:'Venda',   label:'Certidão de ações trabalhistas/cíveis', prio:'critico', done:false},
+      {id:'contrato_imob', cat:'Venda',      label:'Contrato com imobiliária (comissão)', prio:'importante', done:false},
+    ]
+  },
+  { id:'casa_timbo2', name:'Casa Timbó 2', icon:'🏘️', mode:'venda', city:'Timbó', state:'SC',
+    valorImovel:180000, custoAquisicao:140000, iptu:800,
+    situacaoJuridica:'ok',
+    obs:'À venda. Documentação OK.',
+    custos:[
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[{id:'venda', label:'Valor de venda', tipo:'entrada', recorrente:false, valor:0}],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada',              prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública',                 prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se',                         prio:'critico', done:false},
+      {id:'planta',        cat:'Base',       label:'Planta baixa aprovada',             prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação de construção na matrícula', prio:'critico', done:false},
+      {id:'art_rrt',       cat:'Base',       label:'ART / RRT do projeto',              prio:'normal', done:false},
+      // VENDA
+      {id:'cnd_federal',   cat:'Venda',      label:'CND Federal',                       prio:'critico', done:false},
+      {id:'cnd_estadual',  cat:'Venda',      label:'CND Estadual',                      prio:'critico', done:false},
+      {id:'cert_trabalhista', cat:'Venda',   label:'Certidão de ações trabalhistas/cíveis', prio:'critico', done:false},
+      {id:'contrato_imob', cat:'Venda',      label:'Contrato com imobiliária (comissão)', prio:'importante', done:false},
+    ]
+  },
+  { id:'casa_tupi1', name:'Casa Tupi 1', icon:'🏠', mode:'imobiliaria', city:'Tupi Paulista', state:'SP',
+    valorImovel:120000, custoAquisicao:90000, iptu:800,
+    situacaoJuridica:'pendente',
+    obs:'Alugada. Lote ainda em pagamento. Casas não averbadas.',
+    custos:[
+      {id:'parcela_lote', label:'Parcela do lote',   tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'adm_imob',     label:'Taxa imob (descontada)', tipo:'info', recorrente:true, vencDia:null, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[{id:'aluguel', label:'Aluguel líquido', tipo:'entrada', recorrente:true, valor:0}],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada do lote',      prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura do lote (após quitação)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se das casas',               prio:'critico', done:false},
+      {id:'planta',        cat:'Base',       label:'Planta baixa aprovada',             prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação das casas na matrícula',  prio:'critico', done:false},
+      {id:'art_rrt',       cat:'Base',       label:'ART / RRT da construção',           prio:'importante', done:false},
+      // LOCAÇÃO
+      {id:'contrato_loc',  cat:'Locação',    label:'Contrato de locação vigente',       prio:'critico', done:false},
+      {id:'contrato_imob', cat:'Locação',    label:'Contrato com imobiliária',          prio:'critico', done:false},
+      {id:'vistoria_ent',  cat:'Locação',    label:'Vistoria de entrada assinada',      prio:'importante', done:false},
+      {id:'extratos_rep',  cat:'Locação',    label:'Últimos 3 extratos do repasse',     prio:'normal', done:false},
+    ]
+  },
+  { id:'casa_tupi2', name:'Casa Tupi 2', icon:'🏠', mode:'imobiliaria', city:'Tupi Paulista', state:'SP',
+    valorImovel:120000, custoAquisicao:90000, iptu:800,
+    situacaoJuridica:'pendente',
+    obs:'Alugada. Lote ainda em pagamento. Casas não averbadas.',
+    custos:[
+      {id:'parcela_lote', label:'Parcela do lote',   tipo:'saida', recorrente:true, vencDia:10, valor:0},
+      {id:'adm_imob',     label:'Taxa imob (descontada)', tipo:'info', recorrente:true, vencDia:null, valor:0},
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+      {id:'manutencao',   label:'Manutenção',        tipo:'saida', recorrente:false, vencDia:null, valor:0},
+    ],
+    entradas:[{id:'aluguel', label:'Aluguel líquido', tipo:'entrada', recorrente:true, valor:0}],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada do lote',      prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura do lote (após quitação)', prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      {id:'habite_se',     cat:'Base',       label:'Habite-se das casas',               prio:'critico', done:false},
+      {id:'planta',        cat:'Base',       label:'Planta baixa aprovada',             prio:'importante', done:false},
+      {id:'averbacao',     cat:'Base',       label:'Averbação das casas na matrícula',  prio:'critico', done:false},
+      {id:'art_rrt',       cat:'Base',       label:'ART / RRT da construção',           prio:'importante', done:false},
+      // LOCAÇÃO
+      {id:'contrato_loc',  cat:'Locação',    label:'Contrato de locação vigente',       prio:'critico', done:false},
+      {id:'contrato_imob', cat:'Locação',    label:'Contrato com imobiliária',          prio:'critico', done:false},
+      {id:'vistoria_ent',  cat:'Locação',    label:'Vistoria de entrada assinada',      prio:'importante', done:false},
+      {id:'extratos_rep',  cat:'Locação',    label:'Últimos 3 extratos do repasse',     prio:'normal', done:false},
+    ]
+  },
+  { id:'terreno_tupi', name:'Terrenos Tupi Paulista', icon:'📐', mode:'terreno', city:'Tupi Paulista', state:'SP',
+    valorImovel:80000, custoAquisicao:60000, iptu:400,
+    situacaoJuridica:'pendente',
+    obs:'Quitados. Tem termo de quitação. Sem matrícula ou escritura ainda.',
+    custos:[
+      {id:'iptu',         label:'IPTU (parcelado)',  tipo:'saida', recorrente:true, vencDia:30, valor:0},
+    ],
+    entradas:[],
+    docs:[
+      // BASE
+      {id:'matricula',     cat:'Base',       label:'Matrícula atualizada no cartório',  prio:'critico', done:false},
+      {id:'escritura',     cat:'Base',       label:'Escritura pública',                 prio:'critico', done:false},
+      {id:'iptu_carne',    cat:'Base',       label:'Carnê IPTU do ano',                 prio:'importante', done:false},
+      {id:'cnd_mun',       cat:'Base',       label:'CND Municipal',                     prio:'importante', done:false},
+      // TERRENO / RURAL
+      {id:'uso_solo',      cat:'Terreno',    label:'Certidão de uso do solo (prefeitura)', prio:'importante', done:false},
+      {id:'georef',        cat:'Terreno',    label:'Georreferenciamento',               prio:'critico', done:false},
+      {id:'ccir',          cat:'Terreno',    label:'CCIR — se área rural',              prio:'normal', done:false},
+      {id:'itr',           cat:'Terreno',    label:'ITR — se área rural',               prio:'normal', done:false},
+    ]
+  },
+];
+
+const MODE_LABEL = {airbnb:'Airbnb',imobiliaria:'Imobiliária',moradia:'Moradia',venda:'À Venda',lazer:'Lazer',familia:'Família',terreno:'Terreno',comercial:'Comercial'};
+const MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MONTHS_SH = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let S = { view:'dashboard', month:'', tab:'pipeline' };
+
+// ═══════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// SUPABASE — Fase 2
+// ═══════════════════════════════════════
+const SB_URL = 'https://crnoffovqdnfccdpsmvf.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNybm9mZm92cWRuZmNjZHBzbXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODkwMjYsImV4cCI6MjA5NDI2NTAyNn0.Uqe40ilYPNx9lkr1z0GG1qLgda9kWZyY_KYRsRIoMXM';
+const WS     = 'main';
+
+const sbHeaders = () => ({
+  'Content-Type': 'application/json',
+  'apikey': SB_KEY,
+  'Authorization': 'Bearer ' + SB_KEY,
+});
+
+async function sbGet(table, extraFilters = '') {
+  const url = `${SB_URL}/rest/v1/${table}?workspace_id=eq.${WS}${extraFilters}&select=*`;
+  const r = await fetch(url, { headers: sbHeaders() });
+  if (!r.ok) { console.error('sbGet', table, r.status); return []; }
+  return r.json();
+}
+
+async function sbUpsert(table, row) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { ...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({ workspace_id: WS, ...row })
+  });
+  if (!r.ok) console.error('sbUpsert', table, r.status, await r.text());
+}
+
+// Cache em memória para evitar latência nas leituras repetidas dentro da mesma sessão
+const _cache = {};
+function _ck(t, k) { return `${t}::${k}`; }
+
+// Tabelas com PK (workspace_id, prop_id): be_docs, be_ficha, be_contatos, be_seguros, be_reajuste, be_funil, be_responsavel, be_props
+// Tabelas com PK (workspace_id, prop_id, ym): be_pipeline, be_reservas
+// Tabelas com PK (workspace_id, id): be_agenda
+// Tabelas com PK (workspace_id, ym): be_extrato
+// Para simplificar, usamos uma coluna virtual "data_key" = prop_id ou ym concatenado
+// A estratégia: todas as tabelas usam (workspace_id, prop_id) ou variações — guardamos o blob inteiro em "data"
+// Usamos prop_id='_main_' para dados sem prop (agenda, extrato, props)
+
+async function dbGet(table, key) {
+  const ck = _ck(table, key);
+  if (_cache[ck] !== undefined) return _cache[ck];
+  const rows = await sbGet(table, `&prop_id=eq.${encodeURIComponent(key)}`);
+  const val = rows.length ? (rows[0].data ?? null) : null;
+  _cache[ck] = val;
+  return val;
+}
+
+async function dbSet(table, key, val) {
+  _cache[_ck(table, key)] = val;
+  await sbUpsert(table, { prop_id: key, data: val });
+}
+
+// be_agenda e be_extrato têm PK diferente — usam prop_id='_main_' como chave única de blob
+// be_pipeline e be_reservas têm PK (prop_id, ym) — mas guardamos blob inteiro em prop_id='_main_'
+
+// SK agora mapeia para nomes de tabela Supabase
+const SK = {
+  pipeline:'be_pipeline', docs:'be_docs', agenda:'be_agenda',
+  extrato:'be_extrato', ficha:'be_ficha',
+  contatos:'be_contatos',
+  reservas:'be_reservas',
+  seguros:'be_seguros',
+  reajuste:'be_reajuste',
+  funil:'be_funil',
+  responsavel:'be_responsavel',
+  props:'be_props',
+};
+
+// ls agora é wrapper async (todas as funções que usam ls são async)
+const ls = {
+  get: (table) => dbGet(table, 'main'),
+  set: (table, val) => dbSet(table, 'main', val)
+};
+
+// Imóveis dinâmicos: mescla base + cadastrados pelo usuário
+async function loadUserProps() {
+  const extra = await ls.get(SK.props) || [];
+  for (const p of extra) {
+    if (!PROPS.find(x => x.id === p.id)) PROPS.push(p);
+  }
+}
+
+async function addProp(dados) {
+  const extra = await ls.get(SK.props) || [];
+  const idx = extra.findIndex(p => p.id === dados.id);
+  if (idx >= 0) extra.splice(idx, 1);
+  extra.push(dados);
+  await ls.set(SK.props, extra);
+  // Atualizar PROPS em memória
+  const pi = PROPS.findIndex(p => p.id === dados.id);
+  if (pi >= 0) PROPS.splice(pi, 1, dados); else PROPS.push(dados);
+}
+
+async function openNovoImovelModal() {
+  const modal = document.createElement('div'); modal.className = 'modal-bg';
+  modal.innerHTML = `<div class="modal" style="max-width:560px">
+    <div class="modal-title">+ Cadastrar Novo Imóvel</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nome *</label><input id="ni-nome" class="fi" placeholder="Ex: Ap Centro Floripa"></div>
+      <div class="fg"><label class="fl">Ícone / emoji</label><input id="ni-icon" class="fi" placeholder="🏠" style="width:80px"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Tipo *</label><select id="ni-mode" class="fi">
+        <option value="imobiliaria">Imobiliária (alugado)</option>
+        <option value="airbnb">Airbnb</option>
+        <option value="moradia">Moradia própria</option>
+        <option value="venda">À Venda</option>
+        <option value="comercial">Comercial</option>
+        <option value="lazer">Lazer / Chácara</option>
+        <option value="familia">Família</option>
+        <option value="terreno">Terreno</option>
+      </select></div>
+      <div class="fg"><label class="fl">Situação jurídica</label><select id="ni-sj" class="fi">
+        <option value="ok">✓ Documentação OK</option>
+        <option value="parcial" selected>⚠ Documentação parcial</option>
+        <option value="pendente">✕ Documentação pendente</option>
+      </select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Cidade *</label><input id="ni-city" class="fi" placeholder="Curitiba"></div>
+      <div class="fg"><label class="fl">Estado</label><input id="ni-state" class="fi" placeholder="PR" style="width:80px"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Valor de mercado (R$)</label><input id="ni-vm" class="fi" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">Custo de aquisição (R$)</label><input id="ni-ca" class="fi" type="number" placeholder="0"></div>
+      <div class="fg"><label class="fl">IPTU anual (R$)</label><input id="ni-iptu" class="fi" type="number" placeholder="0"></div>
+    </div>
+    <div class="fg"><label class="fl">Observações</label><input id="ni-obs" class="fi" placeholder="Histórico, percepções, pendências..."></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-outline" onclick="this.closest('.modal-bg').remove()">Cancelar</button>
+      <button class="btn btn-primary" id="ni-sv">Cadastrar Imóvel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#ni-sv').onclick = async () => {
+    const nome = modal.querySelector('#ni-nome').value.trim();
+    const city = modal.querySelector('#ni-city').value.trim();
+    if (!nome || !city) { toast('Nome e Cidade são obrigatórios','error'); return; }
+
+    const slug = nome.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/(^_|_$)/g,'') + '_' + Date.now().toString(36);
+    const mode = modal.querySelector('#ni-mode').value;
+    const vm   = parseFloat(modal.querySelector('#ni-vm').value) || 0;
+    const ca   = parseFloat(modal.querySelector('#ni-ca').value) || 0;
+    const iptu = parseFloat(modal.querySelector('#ni-iptu').value) || 0;
+
+    // Custos padrão conforme modo
+    const custosPadrao = {
+      imobiliaria: [{id:'adm_imob',label:'Taxa imobiliária (já descontada)',tipo:'info',recorrente:true,vencDia:null,valor:0},{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      airbnb: [{id:'condominio',label:'Condomínio',tipo:'saida',recorrente:true,vencDia:10,valor:0},{id:'adm_airbnb',label:'Taxa Airbnb/ADM',tipo:'saida',recorrente:true,vencDia:20,valor:0},{id:'energia',label:'Energia',tipo:'saida',recorrente:true,vencDia:15,valor:0},{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      moradia: [{id:'condominio',label:'Condomínio',tipo:'saida',recorrente:true,vencDia:10,valor:0},{id:'energia',label:'Energia',tipo:'saida',recorrente:true,vencDia:15,valor:0},{id:'agua',label:'Água',tipo:'saida',recorrente:true,vencDia:15,valor:0},{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      venda: [{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      comercial: [{id:'condominio',label:'Condomínio',tipo:'saida',recorrente:true,vencDia:10,valor:0},{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      lazer: [{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      familia: [{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0},{id:'manutencao',label:'Manutenção',tipo:'saida',recorrente:false,vencDia:null,valor:0}],
+      terreno: [{id:'iptu',label:'IPTU (parcelado)',tipo:'saida',recorrente:true,vencDia:30,valor:0}],
+    };
+    const entradasPadrao = {
+      imobiliaria: [{id:'aluguel',label:'Aluguel líquido',tipo:'entrada',recorrente:true,valor:0}],
+      airbnb: [{id:'airbnb',label:'Receita Airbnb',tipo:'entrada',recorrente:false,valor:0}],
+      comercial: [{id:'aluguel',label:'Aluguel comercial líquido',tipo:'entrada',recorrente:true,valor:0}],
+      venda: [{id:'venda',label:'Valor de venda',tipo:'entrada',recorrente:false,valor:0}],
+    };
+    const docsPadrao = [
+      {id:'matricula',cat:'Base',label:'Matrícula atualizada',prio:'critico',done:false},
+      {id:'escritura',cat:'Base',label:'Escritura pública',prio:'critico',done:false},
+      {id:'iptu_carne',cat:'Base',label:'Carnê IPTU do ano',prio:'importante',done:false},
+      {id:'cnd_mun',cat:'Base',label:'CND Municipal',prio:'importante',done:false},
+      {id:'habite_se',cat:'Base',label:'Habite-se',prio:'importante',done:false},
+    ];
+
+    const novo = {
+      id: slug, name: nome,
+      icon: modal.querySelector('#ni-icon').value || '🏠',
+      mode, city,
+      state: modal.querySelector('#ni-state').value.toUpperCase() || 'PR',
+      valorImovel: vm, custoAquisicao: ca, iptu,
+      situacaoJuridica: modal.querySelector('#ni-sj').value,
+      obs: modal.querySelector('#ni-obs').value,
+      custos: custosPadrao[mode] || custosPadrao.lazer,
+      entradas: entradasPadrao[mode] || [],
+      docs: docsPadrao,
+    };
+
+    await addProp(novo);
+    modal.remove();
+    toast(`${nome} cadastrado!`);
+    navigate(slug);
+  };
+}
+
+// Pipeline data: { [pid]: { [ym]: { custos: { [cid]: {valor,status,venc,comprovante,obs} }, entradas: { [eid]: {valor,status,data,comprovante,obs} } } } }
+async function getPipeline(pid, ym) {
+  const all = await ls.get(SK.pipeline) || {};
+  if (!all[pid]) all[pid] = {};
+  if (!all[pid][ym]) {
+    const meta = PROPS.find(p => p.id === pid);
+    all[pid][ym] = { custos: {}, entradas: {} };
+    for (const c of (meta.custos || [])) {
+      all[pid][ym].custos[c.id] = { valor: c.valor || 0, status: 'aberto', venc: '', comprovante: null, obs: '' };
+    }
+    for (const e of (meta.entradas || [])) {
+      all[pid][ym].entradas[e.id] = { valor: e.valor || 0, status: 'aguardando', data: '', comprovante: null, obs: '' };
+    }
+    // Não salva automaticamente — apenas retorna o padrão sem sobrescrever dados no Supabase
+  }
+  return all[pid][ym];
+}
+async function savePipeline(pid, ym, data) {
+  const all = await ls.get(SK.pipeline) || {};
+  if (!all[pid]) all[pid] = {};
+  all[pid][ym] = data;
+  await ls.set(SK.pipeline, all);
+}
+
+async function getPropDocs(pid) {
+  const all = await ls.get(SK.docs) || {};
+  if (!all[pid]) {
+    const m = PROPS.find(p => p.id === pid);
+    // Migrar formato novo: docs[] com cat/prio
+    all[pid] = (m.docs || []).map(d => ({
+      id: d.id, cat: d.cat, label: d.label,
+      prio: d.prio || 'normal', done: d.done || false,
+      arquivo: null, validade: '', obs: ''
+    }));
+    await ls.set(SK.docs, all);
+  }
+  return all[pid];
+}
+async function savePropDocs(pid, docs) { const all = await ls.get(SK.docs)||{}; all[pid]=docs; await ls.set(SK.docs,all); }
+
+async function getFicha(pid) {
+  const all = await ls.get(SK.ficha) || {};
+  if (!all[pid]) all[pid] = {};
+  return all[pid];
+}
+async function saveFicha(pid, data) { const all = await ls.get(SK.ficha)||{}; all[pid]=data; await ls.set(SK.ficha,all); }
+
+async function getContatos(pid) { const all=await ls.get(SK.contatos)||{}; if(!all[pid]) all[pid]=[]; return all[pid]; }
+async function saveContatos(pid,v) { const all=await ls.get(SK.contatos)||{}; all[pid]=v; await ls.set(SK.contatos,all); }
+
+async function getReservas(pid,ym) { const all=await ls.get(SK.reservas)||{}; if(!all[pid]) all[pid]={}; if(!all[pid][ym]) all[pid][ym]=[]; return all[pid][ym]; }
+async function saveReservas(pid,ym,v) { const all=await ls.get(SK.reservas)||{}; if(!all[pid]) all[pid]={}; all[pid][ym]=v; await ls.set(SK.reservas,all); }
+
+async function getSeguro(pid) { const all=await ls.get(SK.seguros)||{}; if(!all[pid]) all[pid]={}; return all[pid]; }
+async function saveSeguro(pid,v) { const all=await ls.get(SK.seguros)||{}; all[pid]=v; await ls.set(SK.seguros,all); }
+
+async function getReajuste(pid) { const all=await ls.get(SK.reajuste)||{}; if(!all[pid]) all[pid]={}; return all[pid]; }
+async function saveReajuste(pid,v) { const all=await ls.get(SK.reajuste)||{}; all[pid]=v; await ls.set(SK.reajuste,all); }
+
+async function getFunil(pid) { const all=await ls.get(SK.funil)||{}; if(!all[pid]) all[pid]={preco:0,propostas:[],visitas:[],status:'disponivel',obs:''}; return all[pid]; }
+async function saveFunil(pid,v) { const all=await ls.get(SK.funil)||{}; all[pid]=v; await ls.set(SK.funil,all); }
+
+async function getResponsavel(pid,cid) {
+  const all=await ls.get(SK.responsavel)||{};
+  if(!all[pid]) all[pid]={};
+  if(!all[pid][cid]) all[pid][cid]={resp:'assistente',forma:'boleto',obs:''};
+  return all[pid][cid];
+}
+async function saveResponsavel(pid,cid,v) { const all=await ls.get(SK.responsavel)||{}; if(!all[pid]) all[pid]={}; all[pid][cid]=v; await ls.set(SK.responsavel,all); }
+
+// Yield anual por imóvel: receita anual / valor mercado
+async function computeYield(pid) {
+  const allPipe=await ls.get(SK.pipeline)||{};
+  const propPipe=allPipe[pid]||{};
+  let totalEntradas=0;
+  const meses=Object.keys(propPipe).sort().slice(-12);
+  for(const ym of meses) for(const k in (propPipe[ym]?.entradas||{})) totalEntradas+=Number(propPipe[ym].entradas[k].valor)||0;
+  const meta=PROPS.find(p=>p.id===pid);
+  if(!meta||totalEntradas===0) return null;
+  const ficha=await getFicha(pid);
+  const vm=Number(ficha.valorImovel??meta.valorImovel)||0;
+  if(!vm) return null;
+  const anual=totalEntradas*(12/Math.max(1,meses.length));
+  return (anual/vm*100).toFixed(1);
+}
+
+// Alertas de vencimento próximos (dias)
+async function getVencimentos(diasAnte=7) {
+  const hoje=new Date(); const alertas=[];
+  for(const m of PROPS) {
+    if(!m.custos) continue;
+    for(const c of m.custos.filter(x=>x.tipo!=='info'&&x.vencDia)) {
+      const dias=c.vencDia-hoje.getDate();
+      if(dias>=0&&dias<=diasAnte) alertas.push({prop:m,custo:c,dias,urgente:dias<=2});
+    }
+  }
+  // Documentos com validade vencendo
+  for(const m of PROPS) {
+    const docs=await getPropDocs(m.id);
+    for(const d of docs) {
+      if(!d.validade||d.done) continue;
+      const diff=Math.ceil((new Date(d.validade)-hoje)/(1000*60*60*24));
+      if(diff>=0&&diff<=30) alertas.push({prop:m,doc:d,dias:diff,urgente:diff<=7,isDoc:true});
+    }
+  }
+  return alertas;
+}
+
+// ═══════════════════════════════════════
+// COMPUTE
+// ═══════════════════════════════════════
+async function computeTotals(pid, ym) {
+  const pipe = await getPipeline(pid, ym);
+  let saidas = 0, entradas = 0;
+  for (const k in pipe.custos) saidas += Number(pipe.custos[k].valor) || 0;
+  for (const k in pipe.entradas) entradas += Number(pipe.entradas[k].valor) || 0;
+  return { saidas, entradas, net: entradas - saidas };
+}
+
+async function computeAllTotals(ym) {
+  let totalSaidas = 0, totalEntradas = 0, patrimonio = 0;
+  for (const m of PROPS) {
+    const t = await computeTotals(m.id, ym);
+    totalSaidas += t.saidas; totalEntradas += t.entradas;
+    // Preferir valor atualizado da ficha se disponível
+    const ficha = await getFicha(m.id);
+    patrimonio += Number(ficha.valorImovel ?? m.valorImovel) || 0;
+  }
+  return { totalSaidas, totalEntradas, net: totalEntradas - totalSaidas, patrimonio };
+}
+
+// Pipeline status counters
+async function pipelineStatus(pid, ym) {
+  const pipe = await getPipeline(pid, ym);
+  let totalItems = 0, done = 0;
+  for (const k in pipe.custos) { totalItems++; if (pipe.custos[k].status === 'pago') done++; }
+  for (const k in pipe.entradas) { totalItems++; if (pipe.entradas[k].status === 'recebido') done++; }
+  return { totalItems, done, pendente: totalItems - done };
+}
+
+// ═══════════════════════════════════════
+// FORMAT
+// ═══════════════════════════════════════
+const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);
+const fmtM = ym => { const [y,m]=ym.split('-'); return MONTHS_PT[+m-1]+' '+y; };
+const fmtSh = ym => { const [y,m]=ym.split('-'); return MONTHS_SH[+m-1]+'/'+y.slice(2); };
+const ymNow = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); };
+const addM = (ym,n) => { let [y,m]=ym.split('-').map(Number); m+=n; while(m>12){m-=12;y++;} while(m<1){m+=12;y--;} return y+'-'+String(m).padStart(2,'0'); };
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+async function toast(msg, type='success') {
+  const c=document.getElementById('toast-c');
+  const t=document.createElement('div'); t.className='toast '+type;
+  t.innerHTML=(type==='success'?'✓':type==='error'?'✕':'ℹ')+' '+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),280);},2800);
+}
+
+// ═══════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════
+async function renderSidebar() {
+  const sb = document.getElementById('sidebar'); sb.innerHTML = '';
+  const mk = (label,view,icon,dot) => {
+    const el=document.createElement('div'); el.className='sb-item'+(S.view===view?' active':'');
+    el.innerHTML=(dot?`<span class="sb-dot ${dot}"></span>`:`<span style="font-size:14px;width:16px;text-align:center">${icon}</span>`)+`<span class="sb-name">${label}</span>`;
+    el.onclick=()=>navigate(view); return el;
+  };
+  const venc=await getVencimentos(5);
+  const sec=document.createElement('div');
+  sec.appendChild(mk('Dashboard','dashboard','📊'));
+  sec.appendChild(mk('Pipeline Geral','pipeline','🔄'));
+  sec.appendChild(mk('Agenda','agenda','📅'));
+  sec.appendChild(mk('Documentos','documentos','📁'));
+  sec.appendChild(mk('Extrato','extrato','💳'));
+  sec.appendChild(mk('Relatório','relatorio','📋'));
+  sec.appendChild(mk('Ranking','ranking','🏆'));
+  {
+    const el=document.createElement('div'); el.className='sb-item'+(S.view==='alertas'?' active':'');
+    el.innerHTML=`<span style="font-size:14px;width:16px;text-align:center">🔔</span><span class="sb-name">Alertas</span>${venc.length?`<span class="sb-pill" style="background:#ef4444;color:#fff">${venc.length}</span>`:''}`;
+    el.onclick=()=>navigate('alertas'); sec.appendChild(el);
+  }
+  sb.appendChild(sec);
+
+  const groups=[
+    {key:'imobiliaria',label:'Alugados'},{key:'airbnb',label:'Airbnb'},
+    {key:'comercial',label:'Comercial'},{key:'moradia',label:'Moradia'},
+    {key:'familia',label:'Família'},{key:'lazer',label:'Lazer'},
+    {key:'venda',label:'À Venda'},{key:'terreno',label:'Terrenos'},
+  ];
+  for (const grp of groups) {
+    const items = PROPS.filter(p=>p.mode===grp.key);
+    if (!items.length) continue;
+    const div=document.createElement('div'); div.className='sb-div'; sb.appendChild(div);
+    const lbl=document.createElement('div'); lbl.className='sb-lbl'; lbl.textContent=grp.label; sb.appendChild(lbl);
+    const s=document.createElement('div');
+    for (const p of items) {
+      const ps=await pipelineStatus(p.id,S.month);
+      const pill=ps.pendente>0?`🔴`:p.situacaoJuridica==='pendente'?'🟡':'';
+      const el=document.createElement('div'); el.className='sb-item'+(S.view===p.id?' active':'');
+      el.innerHTML=`<span class="sb-dot dot-${p.mode}"></span><span class="sb-name">${p.name}</span>${pill?`<span class="sb-pill">${pill}</span>`:''}`;
+      el.onclick=()=>navigate(p.id); s.appendChild(el);
+    }
+    sb.appendChild(s);
+  }
+  const d2=document.createElement('div'); d2.className='sb-div'; sb.appendChild(d2);
+  const s2=document.createElement('div'); s2.appendChild(mk('Configurações','config','⚙️')); sb.appendChild(s2);
+
+  // Botão + Novo Imóvel
+  const d3=document.createElement('div'); d3.className='sb-div'; sb.appendChild(d3);
+  const btnNovo=document.createElement('div'); btnNovo.className='sb-item';
+  btnNovo.style.cssText='color:rgba(255,255,255,.7);font-weight:600';
+  btnNovo.innerHTML='<span style="font-size:14px;width:16px;text-align:center">＋</span><span class="sb-name">Novo Imóvel</span>';
+  btnNovo.onclick=openNovoImovelModal; sb.appendChild(btnNovo);
+}
+
+// ═══════════════════════════════════════
+// NAVIGATE
+// ═══════════════════════════════════════
+async function navigate(view) {
+  const isProp = PROPS.some(p=>p.id===view);
+  const changingProp = isProp && S.view !== view;
+  S.view=view;
+  if (changingProp) S.tab='ficha';
+  else if (!isProp) S.tab='pipeline';
+  await renderSidebar(); await renderMain();
+}
+
+// ═══════════════════════════════════════
+// MONTH NAV
+// ═══════════════════════════════════════
+async function mkMN() {
+  const nav=document.createElement('div'); nav.className='mn';
+  const p=document.createElement('button'); p.innerHTML='‹';
+  const l=document.createElement('div'); l.className='mn-lbl'; l.textContent=fmtM(S.month);
+  const n=document.createElement('button'); n.innerHTML='›';
+  const h=document.createElement('button'); h.className='mn-hoje'; h.textContent='Hoje';
+  p.onclick=async ()=>{S.month=addM(S.month,-1);renderMain();};
+  n.onclick=async ()=>{S.month=addM(S.month,1);renderMain();};
+  h.onclick=async ()=>{S.month=ymNow();renderMain();};
+  nav.append(p,l,n,h); return nav;
+}
+
+// ═══════════════════════════════════════
+// MAIN ROUTER
+// ═══════════════════════════════════════
+async function renderMain() {
+  const main=document.getElementById('main');
+  document.getElementById('hdr-month').textContent=fmtM(S.month);
+  if (S.view==='dashboard') await renderDashboard(main);
+  else if (S.view==='pipeline') await renderPipelineGeral(main);
+  else if (S.view==='agenda') await renderAgenda(main);
+  else if (S.view==='documentos') await renderDocumentos(main);
+  else if (S.view==='extrato') await renderExtrato(main);
+  else if (S.view==='relatorio') await renderRelatorio(main);
+  else if (S.view==='ranking') await renderRanking(main);
+  else if (S.view==='alertas') await renderAlertas(main);
+  else if (S.view==='config') await renderConfig(main);
+  else { const m=PROPS.find(p=>p.id===S.view); if(m) await renderProperty(main,m); }
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+async function renderDashboard(main) {
+  main.innerHTML='';
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML='<div><div class="pg-title">Dashboard</div><div class="pg-sub">Visão geral — '+fmtM(S.month)+'</div></div>';
+  ph.appendChild(await mkMN()); main.appendChild(ph);
+
+  const ym=S.month;
+
+  // Alertas de vencimento próximos (5 dias)
+  const vencimentos=await getVencimentos(5);
+  if(vencimentos.length) {
+    const av=document.createElement('div'); av.className='alert alert-warn'; av.style.marginBottom='10px';
+    av.innerHTML=`<div class="alert-icon">🔔</div><div><div class="alert-title">Vencimentos próximos</div><div class="alert-venc-list" style="margin-top:5px">${vencimentos.slice(0,4).map(v=>
+      v.isDoc ? `<div class="alert-venc-item ${v.urgente?'urgente':'aviso'}">📄 <strong>${v.prop.name}</strong> — ${v.doc.label} vence em ${v.dias}d</div>`
+              : `<div class="alert-venc-item ${v.urgente?'urgente':'aviso'}">💳 <strong>${v.prop.name}</strong> — ${v.custo.label} vence dia ${v.custo.vencDia} (${v.dias}d)</div>`
+    ).join('')}</div></div>`;
+    av.innerHTML += vencimentos.length>4 ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px">+${vencimentos.length-4} mais — <a href="#" onclick="navigate('alertas');return false" style="color:var(--accent)">ver todos</a></div>` : '';
+    main.appendChild(av);
+  }
+
+  // Alerts balões
+  for (const m of PROPS) {
+    if (!m.baloes) continue;
+    const b=m.baloes.find(b=>b.mes===ym);
+    if (b) { const al=document.createElement('div'); al.className='alert alert-danger'; al.innerHTML=`<div class="alert-icon">⚠️</div><div><div class="alert-title">Balão — ${m.name}</div>${fmt(b.valor)} vence este mês</div>`; main.appendChild(al); }
+  }
+
+  const tots = await computeAllTotals(ym);
+  let pending = 0;
+  for (const m of PROPS) { const ps = await pipelineStatus(m.id,ym); pending += ps.pendente; }
+  // Passivo: balões restantes + parcelas restantes
+  const passivo = PROPS.reduce((acc,m)=>{
+    if(m.baloes) acc+=m.baloes.filter(b=>b.mes>=ym).reduce((s,b)=>s+b.valor,0);
+    return acc;
+  },0);
+  const patrimonioLiq = tots.patrimonio - passivo;
+  const kpis=[
+    {label:'Entradas do Mês', val:fmt(tots.totalEntradas), cls:'green', sub:`${PROPS.filter(p=>['imobiliaria','airbnb'].includes(p.mode)).length} imóveis gerando renda`},
+    {label:'Saídas do Mês', val:fmt(tots.totalSaidas), cls:'red', sub:'Custos de todos os imóveis'},
+    {label:'Resultado Líquido', val:fmt(tots.net), cls:tots.net>=0?'green':'red', sub:tots.net>=0?'Superávit':'Déficit'},
+    {label:'Patrimônio Bruto', val:fmt(tots.patrimonio), cls:'blue', sub:`${PROPS.length} imóveis`},
+    {label:'Patrimônio Líquido', val:fmt(patrimonioLiq), cls:'purple', sub:`Passivo: ${fmt(passivo)}`},
+    {label:'Itens Pendentes', val:pending, cls:pending>0?'yellow':'green', sub:'Pagamentos e recebimentos'},
+  ];
+  const kg=document.createElement('div'); kg.className='kpi-grid';
+  for (const k of kpis) { const c=document.createElement('div'); c.className='kpi '+k.cls; c.innerHTML=`<div class="kpi-lbl">${k.label}</div><div class="kpi-val ${k.cls}">${k.val}</div><div class="kpi-sub">${k.sub}</div>`; kg.appendChild(c); }
+  main.appendChild(kg);
+
+  // Chart card (SVG inline — sem CDN)
+  const cc=document.createElement('div'); cc.className='card';
+  cc.innerHTML='<div class="card-hdr"><div class="card-title">Resultado por Imóvel</div></div><div class="card-body"><div id="dc-wrap" style="width:100%;overflow-x:auto;padding:8px 0"></div></div>';
+  main.appendChild(cc);
+
+  // Table
+  const tc=document.createElement('div'); tc.className='card';
+  tc.innerHTML=`<div class="card-hdr"><div class="card-title">Todos os Imóveis</div></div><div style="overflow-x:auto"><table class="tbl">
+  <thead><tr><th>Imóvel</th><th>Modo</th><th>Cidade/UF</th><th class="num">Entradas</th><th class="num">Saídas</th><th class="num">Resultado</th><th>Pipeline</th><th>Doc.</th></tr></thead>
+  <tbody id="dash-tbody"></tbody></table></div>`;
+  main.appendChild(tc);
+
+  const tb=tc.querySelector('#dash-tbody');
+  const allTotals = [];
+  for (const m of PROPS) {
+    const t=await computeTotals(m.id,ym);
+    allTotals.push(t);
+    const ps=await pipelineStatus(m.id,ym);
+    const sj=m.situacaoJuridica==='ok'?'<span class="badge b-ok">✓</span>':m.situacaoJuridica==='parcial'?'<span class="badge b-parcial">⚠</span>':'<span class="badge b-pend">✕</span>';
+    const pp=ps.pendente===0?'<span class="badge b-ok">✓ OK</span>':`<span class="badge b-pend">${ps.pendente} pendentes</span>`;
+    const tr=document.createElement('tr'); tr.className='clickable';
+    tr.innerHTML=`<td><span style="margin-right:6px">${m.icon}</span>${m.name}</td><td><span class="badge b-${m.mode}">${MODE_LABEL[m.mode]||m.mode}</span></td><td class="tm">${m.city}, ${m.state}</td><td class="num ${t.entradas>0?'tg':'tm'}">${fmt(t.entradas)}</td><td class="num ${t.saidas>0?'tr':'tm'}">${fmt(t.saidas)}</td><td class="num ${t.net>0?'tg':t.net<0?'tr':'tm'}">${fmt(t.net)}</td><td>${pp}</td><td>${sj}</td>`;
+    tr.onclick=()=>navigate(m.id); tb.appendChild(tr);
+  }
+
+  // Gráfico SVG inline — sem dependência externa
+  (function drawSVGChart(totals, props) {
+    const wrap = document.getElementById('dc-wrap');
+    if (!wrap) return;
+
+    const n = Math.min(totals.length, props.length);
+    const BAR_W = 18, GAP = 6, GROUP_GAP = 22;
+    const PAD_L = 52, PAD_R = 12, PAD_T = 36, PAD_B = 56;
+    const H_PLOT = 180;
+    const totalW = PAD_L + n * (2 * BAR_W + GAP + GROUP_GAP) + PAD_R;
+    const totalH = PAD_T + H_PLOT + PAD_B;
+
+    const allVals = totals.flatMap(t => [t.entradas, t.saidas]);
+    const maxVal = Math.max(...allVals, 1);
+
+    function scaleY(v) { return H_PLOT - Math.round((v / maxVal) * H_PLOT); }
+    function fmtK(v) {
+      if (v >= 1000000) return 'R$' + (v/1000000).toFixed(1) + 'M';
+      if (v >= 1000) return 'R$' + (v/1000).toFixed(0) + 'k';
+      return 'R$' + v;
+    }
+
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" style="font-family:-apple-system,sans-serif;font-size:10px">`;
+
+    // Y grid lines (5 lines)
+    for (let i = 0; i <= 4; i++) {
+      const v = Math.round((maxVal / 4) * i);
+      const y = PAD_T + scaleY(v);
+      svg += `<line x1="${PAD_L}" y1="${y}" x2="${totalW - PAD_R}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>`;
+      svg += `<text x="${PAD_L - 4}" y="${y + 4}" text-anchor="end" fill="#94a3b8">${fmtK(v)}</text>`;
+    }
+
+    // Bars
+    for (let i = 0; i < n; i++) {
+      const t = totals[i];
+      const x0 = PAD_L + i * (2 * BAR_W + GAP + GROUP_GAP);
+
+      // Entradas bar
+      const heE = Math.max(Math.round((t.entradas / maxVal) * H_PLOT), 1);
+      const xE = x0;
+      const yE = PAD_T + H_PLOT - heE;
+      svg += `<rect x="${xE}" y="${yE}" width="${BAR_W}" height="${heE}" fill="#86efac" rx="3"/>`;
+
+      // Saídas bar
+      const heS = Math.max(Math.round((t.saidas / maxVal) * H_PLOT), 1);
+      const xS = x0 + BAR_W + GAP;
+      const yS = PAD_T + H_PLOT - heS;
+      svg += `<rect x="${xS}" y="${yS}" width="${BAR_W}" height="${heS}" fill="#fca5a5" rx="3"/>`;
+
+      // Label
+      const label = (props[i] && props[i].name) ? props[i].name.split(' ').slice(0, 2).join(' ') : `Imóvel ${i+1}`;
+      const cx = x0 + BAR_W + GAP / 2;
+      svg += `<text x="${cx}" y="${PAD_T + H_PLOT + 14}" text-anchor="middle" fill="#64748b" transform="rotate(35 ${cx} ${PAD_T + H_PLOT + 14})">${label}</text>`;
+    }
+
+    // Baseline
+    svg += `<line x1="${PAD_L}" y1="${PAD_T + H_PLOT}" x2="${totalW - PAD_R}" y2="${PAD_T + H_PLOT}" stroke="#cbd5e1" stroke-width="1.5"/>`;
+
+    // Legend
+    svg += `<rect x="${PAD_L}" y="8" width="12" height="10" fill="#86efac" rx="2"/>`;
+    svg += `<text x="${PAD_L + 16}" y="17" fill="#374151">Entradas</text>`;
+    svg += `<rect x="${PAD_L + 72}" y="8" width="12" height="10" fill="#fca5a5" rx="2"/>`;
+    svg += `<text x="${PAD_L + 88}" y="17" fill="#374151">Saídas</text>`;
+
+    svg += `</svg>`;
+    wrap.innerHTML = svg;
+  })(allTotals, PROPS);
+}
+
+// ═══════════════════════════════════════
+// PROPERTY VIEW
+// ═══════════════════════════════════════
+async function renderProperty(main, meta) {
+  main.innerHTML='';
+  const sj=meta.situacaoJuridica==='ok'?'✓ Documentação OK':meta.situacaoJuridica==='parcial'?'⚠ Documentação parcial':'✕ Documentação pendente';
+  const sjc=meta.situacaoJuridica==='ok'?'tg':meta.situacaoJuridica==='parcial'?'':'tr';
+
+  const ph=document.createElement('div'); ph.className='prop-hdr';
+  ph.innerHTML=`<div class="prop-icon ${meta.mode}">${meta.icon}</div>
+  <div style="flex:1"><div class="prop-name">${meta.name}</div>
+  <div class="prop-loc">📍 ${meta.city}, ${meta.state} · <span class="${sjc}" style="font-size:12px;font-weight:600">${sj}</span></div></div>
+  <span class="badge b-${meta.mode}">${MODE_LABEL[meta.mode]||meta.mode}</span>`;
+  const mnEl=await mkMN(); ph.appendChild(mnEl); main.appendChild(ph);
+
+  if (meta.obs) { const al=document.createElement('div'); al.className='alert alert-info'; al.innerHTML=`<div class="alert-icon">ℹ️</div><div>${meta.obs}</div>`; main.appendChild(al); }
+
+  const tabs=document.createElement('div'); tabs.className='tabs';
+  const tabDefs=[
+    {id:'ficha',     label:'🏠 Ficha'},
+    {id:'pipeline',  label:'🔄 Pipeline'},
+    {id:'historico', label:'📊 Histórico'},
+    {id:'documentos',label:'📄 Documentos'},
+    {id:'contatos',  label:'📞 Contatos'},
+    {id:'seguro',    label:'🛡️ Seguro'},
+    {id:'reajuste',  label:'📈 Reajuste', cond:['imobiliaria','comercial']},
+    {id:'reservas',  label:'🗓️ Reservas',  cond:['airbnb']},
+    {id:'funil',     label:'🏷️ Funil Venda', cond:['venda']},
+    {id:'venda',     label:'💰 DRE/Venda', cond:['venda','imobiliaria','airbnb','comercial']},
+  ];
+  for (const t of tabDefs) {
+    if (t.cond && !t.cond.includes(meta.mode)) continue;
+    const btn=document.createElement('button'); btn.className='tab'+(S.tab===t.id?' active':''); btn.textContent=t.label;
+    btn.onclick=async ()=>{S.tab=t.id;await renderMain();}; tabs.appendChild(btn);
+  }
+  main.appendChild(tabs);
+
+  if (S.tab==='ficha')       renderPropFicha(main, meta);
+  else if (S.tab==='pipeline')   renderPropPipeline(main, meta);
+  else if (S.tab==='historico')  renderPropHistorico(main, meta);
+  else if (S.tab==='documentos') renderPropDocs(main, meta);
+  else if (S.tab==='contatos')   renderPropContatos(main, meta);
+  else if (S.tab==='seguro')     renderPropSeguro(main, meta);
+  else if (S.tab==='reajuste')   renderPropReajuste(main, meta);
+  else if (S.tab==='reservas')   renderPropReservas(main, meta);
+  else if (S.tab==='funil')      renderPropFunil(main, meta);
+  else if (S.tab==='venda')      renderDRE(main, meta);
+}
+
+// ─── FICHA CADASTRAL ───
+async function renderPropFicha(main, meta) {
+  const ficha = await getFicha(meta.id);
+  const propMirror = ['nome','icon','mode','situacaoJuridica','valorImovel','custoAquisicao','iptu'];
+  const modeToMeta = {nome:'name',icon:'icon',mode:'mode',situacaoJuridica:'situacaoJuridica',valorImovel:'valorImovel',custoAquisicao:'custoAquisicao',iptu:'iptu'};
+  const isUserProp = !!((await ls.get(SK.props))||[]).find(p=>p.id===meta.id);
+  const save = async (k, v) => {
+    ficha[k] = v; await saveFicha(meta.id, ficha); toast('Salvo');
+    // Sincronizar campos críticos no objeto meta e no be3_props se for imóvel do usuário
+    if (propMirror.includes(k) && modeToMeta[k]) { meta[modeToMeta[k]] = v; }
+    if (isUserProp) {
+      const extra = await ls.get(SK.props)||[];
+      const idx = extra.findIndex(p=>p.id===meta.id);
+      if (idx>=0) { if(modeToMeta[k]) extra[idx][modeToMeta[k]]=v; await ls.set(SK.props, extra); }
+    }
+  };
+
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = '<div class="card-hdr"><div class="card-title">🏠 Ficha Cadastral</div></div><div class="card-body"></div>';
+  const body = card.querySelector('.card-body');
+
+  // Seção: Identificação
+  const mkSection = (title) => {
+    const s = document.createElement('div'); s.style.cssText = 'margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)';
+    s.innerHTML = `<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text-soft);margin-bottom:10px">${title}</div>`;
+    return s;
+  };
+
+  // metaMap: mapeamento de chave da ficha → chave correspondente no meta (para leitura de fallback)
+  const metaMap = {nome:'name', icon:'icon', mode:'mode', situacaoJuridica:'situacaoJuridica', cidade:'city', estado:'state', valorImovel:'valorImovel', custoAquisicao:'custoAquisicao', iptu:'iptu'};
+  const mkField = (label, key, type='text', placeholder='', opts=null) => {
+    const fg = document.createElement('div'); fg.className = 'fg';
+    fg.innerHTML = `<label class="fl">${label}</label>`;
+    const metaKey = metaMap[key];
+    const metaVal = metaKey ? (meta[metaKey] ?? '') : '';
+    if (opts) {
+      const sel = document.createElement('select'); sel.className = 'fi';
+      const curVal = ficha[key] !== undefined ? ficha[key] : metaVal;
+      for (const [v,l] of opts) { const o=document.createElement('option'); o.value=v; o.textContent=l; if(curVal===v) o.selected=true; sel.appendChild(o); }
+      sel.onchange = () => save(key, sel.value);
+      fg.appendChild(sel);
+    } else {
+      const inp = document.createElement('input'); inp.type = type; inp.className = 'fi';
+      inp.value = ficha[key] !== undefined ? ficha[key] : metaVal;
+      if (placeholder && !inp.value) inp.placeholder = placeholder;
+      inp.onchange = () => save(key, type==='number' ? (parseFloat(inp.value.replace(',','.'))||0) : inp.value);
+      fg.appendChild(inp);
+    }
+    return fg;
+  };
+
+  const formGrid = (fields) => {
+    const fr = document.createElement('div'); fr.className = 'fr';
+    for (const f of fields) fr.appendChild(mkField(...f));
+    return fr;
+  };
+
+  // IDENTIFICAÇÃO
+  const sId = mkSection('Identificação');
+  sId.appendChild(formGrid([
+    ['Nome do imóvel', 'nome', 'text', 'Ex: Ap Centro Floripa'],
+    ['Ícone / emoji', 'icon', 'text', '🏠'],
+  ]));
+  sId.appendChild(formGrid([
+    ['Tipo / Modo', 'mode', 'text', '', [['airbnb','Airbnb'],['imobiliaria','Imobiliária'],['moradia','Moradia'],['venda','À Venda'],['lazer','Lazer'],['familia','Família'],['terreno','Terreno'],['comercial','Comercial']]],
+    ['Situação jurídica', 'situacaoJuridica', 'text', '', [['ok','✓ Documentação OK'],['parcial','⚠ Documentação parcial'],['pendente','✕ Documentação pendente']]],
+  ]));
+  body.appendChild(sId);
+
+  // ENDEREÇO
+  const sEnd = mkSection('Endereço');
+  sEnd.appendChild(formGrid([
+    ['Endereço completo', 'endereco', 'text', 'Rua, número, complemento'],
+    ['Bairro', 'bairro', 'text', ''],
+  ]));
+  sEnd.appendChild(formGrid([
+    ['Cidade', 'cidade', 'text', 'Ex: Curitiba'],
+    ['Estado (UF)', 'estado', 'text', 'PR'],
+    ['CEP', 'cep', 'text', '00000-000'],
+  ]));
+  body.appendChild(sEnd);
+
+  // CARACTERÍSTICAS
+  const sCarac = mkSection('Características');
+  sCarac.appendChild(formGrid([
+    ['Área privativa (m²)', 'area_privativa', 'number', ''],
+    ['Área total (m²)', 'area_total', 'number', ''],
+    ['Quartos', 'quartos', 'number', ''],
+    ['Banheiros', 'banheiros', 'number', ''],
+    ['Vagas de garagem', 'vagas', 'number', ''],
+    ['Andar / Bloco', 'andar_bloco', 'text', 'Ex: 8º andar, Bloco B'],
+  ]));
+  body.appendChild(sCarac);
+
+  // VALORES
+  const sVal = mkSection('Valores');
+  sVal.appendChild(formGrid([
+    ['Valor de mercado atual (R$)', 'valorImovel', 'number', ''],
+    ['Custo de aquisição (R$)', 'custoAquisicao', 'number', ''],
+    ['IPTU anual (R$)', 'iptu', 'number', ''],
+  ]));
+
+  // Mostrar yield se tiver valor
+  const vmk = ficha.valorImovel ?? meta.valorImovel;
+  const yld = await computeYield(meta.id);
+  if (vmk) {
+    const info = document.createElement('div'); info.className = 'seguro-card';
+    info.innerHTML = `<div style="font-size:12px;font-weight:700;color:#1e40af;margin-bottom:8px">Métricas Patrimoniais</div>
+      <div class="rel-row"><span>Valor de mercado</span><strong>${fmt(ficha.valorImovel ?? meta.valorImovel)}</strong></div>
+      <div class="rel-row"><span>Custo de aquisição</span><strong>${fmt(ficha.custoAquisicao ?? meta.custoAquisicao)}</strong></div>
+      <div class="rel-row"><span>Valorização estimada</span><strong class="tg">+${fmt((ficha.valorImovel??meta.valorImovel)-(ficha.custoAquisicao??meta.custoAquisicao))}</strong></div>
+      ${yld ? `<div class="rel-row"><span>Yield anual (12m)</span><strong class="tg">${yld}% a.a.</strong></div>` : ''}`;
+    sVal.appendChild(info);
+  }
+  body.appendChild(sVal);
+
+  // AQUISIÇÃO
+  const sAq = mkSection('Histórico de Aquisição');
+  sAq.appendChild(formGrid([
+    ['Data de aquisição', 'data_aquisicao', 'date', ''],
+    ['Forma de aquisição', 'forma_aquisicao', 'text', '', [['compra_direta','Compra direta'],['financiamento','Financiamento bancário'],['leilao','Leilão'],['heranca','Herança'],['doacao','Doação'],['permuta','Permuta'],['parcelado_proprietario','Parcelado c/ proprietário'],['parcelado_construtora','Parcelado c/ construtora'],['outro','Outro']]],
+  ]));
+  sAq.appendChild(formGrid([
+    ['Nº da matrícula', 'matricula_num', 'text', 'Ex: 12345 — CRI Curitiba'],
+    ['Cartório de Registro', 'cartorio', 'text', 'Ex: 1º CRI de Curitiba'],
+  ]));
+  const obsAq = document.createElement('div'); obsAq.className = 'fg';
+  obsAq.innerHTML = '<label class="fl">Observações gerais</label>';
+  const ta = document.createElement('textarea'); ta.className = 'fi'; ta.rows = 3;
+  ta.style.resize = 'vertical';
+  ta.value = ficha.obs_geral ?? meta.obs ?? '';
+  ta.placeholder = 'Histórico, pendências, percepções sobre o imóvel...';
+  ta.onchange = () => save('obs_geral', ta.value);
+  obsAq.appendChild(ta); sAq.appendChild(obsAq);
+  body.appendChild(sAq);
+
+  main.appendChild(card);
+}
+
+// ─── PIPELINE POR IMÓVEL ───
+async function renderPropPipeline(main, meta) {
+  const ym=S.month, pipe=await getPipeline(meta.id, ym);
+  let totalSaidas=0, totalEntradas=0;
+  for (const k in pipe.custos) totalSaidas += Number(pipe.custos[k].valor)||0;
+  for (const k in pipe.entradas) totalEntradas += Number(pipe.entradas[k].valor)||0;
+
+  // ENTRADAS
+  if (meta.entradas && meta.entradas.length) {
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML='<div class="card-hdr"><div class="card-title">📥 Entradas — Recebimentos</div></div><div class="card-body"></div>';
+    const body=card.querySelector('.card-body');
+    for (const e of meta.entradas) {
+      const ed=pipe.entradas[e.id]||(pipe.entradas[e.id]={valor:e.valor||0,status:'aguardando',data:'',comprovante:null,obs:''});
+      body.appendChild(await mkPipeRow({
+        label: e.label, subLabel: e.recorrente?'Recorrente':'Variável',
+        valor: ed.valor, status: ed.status,
+        statusOpts: [{v:'aguardando',l:'Aguardando'},{v:'verificado',l:'Verificado'},{v:'recebido',l:'✓ Recebido'}],
+        comprovante: ed.comprovante,
+        onValor: async v => { ed.valor=v; await savePipeline(meta.id,ym,pipe); updateRB(); },
+        onStatus: async s => { ed.status=s; await savePipeline(meta.id,ym,pipe); renderSidebar(); toast(s==='recebido'?'Marcado como recebido':s==='verificado'?'Verificado':'Aguardando'); },
+        onComp: async f => { ed.comprovante=f; await savePipeline(meta.id,ym,pipe); toast('Comprovante salvo'); },
+        onObs: async t => { ed.obs=t; await savePipeline(meta.id,ym,pipe); },
+        isEntrada: true
+      }));
+    }
+    main.appendChild(card);
+  }
+
+  // SAÍDAS
+  const saidas = meta.custos ? meta.custos.filter(c=>c.tipo!=='info') : [];
+  const infos = meta.custos ? meta.custos.filter(c=>c.tipo==='info') : [];
+
+  if (saidas.length) {
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML='<div class="card-hdr"><div class="card-title">📤 Saídas — Pagamentos</div></div><div class="card-body"></div>';
+    const body=card.querySelector('.card-body');
+    for (const c of saidas) {
+      const cd=pipe.custos[c.id]||(pipe.custos[c.id]={valor:c.valor||0,status:'aberto',venc:'',comprovante:null,obs:''});
+      body.appendChild(await mkPipeRow({
+        label: c.label, subLabel: c.recorrente?`Recorrente · vence dia ${c.vencDia||'?'}`:'Eventual',
+        valor: cd.valor, status: cd.status,
+        statusOpts: [{v:'aberto',l:'Em aberto'},{v:'boleto_ok',l:'Boleto OK'},{v:'pago',l:'✓ Pago'}],
+        comprovante: cd.comprovante,
+        onValor: async v => { cd.valor=v; await savePipeline(meta.id,ym,pipe); updateRB(); },
+        onStatus: async s => { cd.status=s; await savePipeline(meta.id,ym,pipe); renderSidebar(); toast(s==='pago'?'Marcado como pago':s==='boleto_ok'?'Boleto OK registrado':'Em aberto'); },
+        onComp: async f => { cd.comprovante=f; await savePipeline(meta.id,ym,pipe); toast('Comprovante salvo'); },
+        onObs: async t => { cd.obs=t; await savePipeline(meta.id,ym,pipe); },
+        isEntrada: false, pid: meta.id, cid: c.id
+      }));
+    }
+    main.appendChild(card);
+  }
+
+  if (infos.length) {
+    const infoCard=document.createElement('div'); infoCard.className='alert alert-info'; infoCard.style.marginBottom='16px';
+    infoCard.innerHTML=`<div class="alert-icon">ℹ️</div><div><div class="alert-title">Descontos automáticos da imobiliária</div>${infos.map(i=>i.label).join(' · ')}<br><small>Esses valores são descontados antes do repasse — não há boleto separado.</small></div>`;
+    main.appendChild(infoCard);
+  }
+
+  // Result bar
+  const rb=document.createElement('div'); rb.className='result-bar'; rb.id='result-bar';
+  function fillRB() {
+    let si=0,ei=0;
+    for(const k in pipe.custos) si+=Number(pipe.custos[k].valor)||0;
+    for(const k in pipe.entradas) ei+=Number(pipe.entradas[k].valor)||0;
+    rb.innerHTML=`<div class="rb-item"><div class="rb-lbl">Entradas</div><div class="rb-val tg">${fmt(ei)}</div></div><div class="rb-sep"></div><div class="rb-item"><div class="rb-lbl">Saídas</div><div class="rb-val tr">${fmt(si)}</div></div><div class="rb-sep"></div><div class="rb-item"><div class="rb-lbl">Resultado</div><div class="rb-val ${ei-si>=0?'tg':'tr'}">${fmt(ei-si)}</div></div>`;
+  }
+  fillRB(); main.appendChild(rb);
+  window.updateRB = fillRB;
+}
+
+async function mkPipeRow({label, subLabel, valor, status, statusOpts, comprovante, onValor, onStatus, onComp, onObs, isEntrada, pid, cid}) {
+  const row=document.createElement('div'); row.className='pipe-row';
+
+  const info=document.createElement('div'); info.style.flex='1';
+  info.innerHTML=`<div class="pipe-cat">${label}</div><div class="pipe-cat-sub">${subLabel}</div>`;
+
+  // Responsável + forma (só saídas)
+  if (!isEntrada && pid && cid) {
+    const resp=await getResponsavel(pid,cid);
+    const respSel=document.createElement('select'); respSel.className='isel'; respSel.title='Responsável';
+    [{v:'assistente',l:'👩 Assistente'},{v:'imobiliaria',l:'🏢 Imobiliária'},{v:'auto',l:'🤖 Auto-débito'}].forEach(o=>{
+      const op=document.createElement('option'); op.value=o.v; op.textContent=o.l; if(o.v===resp.resp) op.selected=true; respSel.appendChild(op);
+    });
+    respSel.onchange=async ()=>{resp.resp=respSel.value; await saveResponsavel(pid,cid,resp); toast('Responsável salvo');};
+    const formaSel=document.createElement('select'); formaSel.className='isel'; formaSel.title='Forma';
+    [{v:'boleto',l:'📄 Boleto'},{v:'pix',l:'💸 PIX'},{v:'debito',l:'🏦 Débito auto'},{v:'dinheiro',l:'💵 Dinheiro'}].forEach(o=>{
+      const op=document.createElement('option'); op.value=o.v; op.textContent=o.l; if(o.v===resp.forma) op.selected=true; formaSel.appendChild(op);
+    });
+    formaSel.onchange=async ()=>{resp.forma=formaSel.value; await saveResponsavel(pid,cid,resp); toast('Forma salvo');};
+    info.appendChild(respSel); info.appendChild(formaSel);
+  }
+
+  const valInp=document.createElement('input'); valInp.type='text'; valInp.className='pipe-val';
+  valInp.value=valor>0?valor.toString():''; valInp.placeholder='R$ 0,00';
+  valInp.onchange=()=>{const v=parseFloat(valInp.value.replace(',','.'))||0; onValor(v); toast('Valor salvo');};
+
+  const sel=document.createElement('select'); sel.className='isel';
+  for (const o of statusOpts) { const op=document.createElement('option'); op.value=o.v; op.textContent=o.l; if(o.v===status) op.selected=true; sel.appendChild(op); }
+  sel.onchange=()=>onStatus(sel.value);
+
+  const fi=document.createElement('input'); fi.type='file'; fi.accept='image/*,.pdf'; fi.style.display='none';
+  const chip=document.createElement('div'); chip.className='up-chip'+(comprovante?' has-file':'');
+  chip.innerHTML=comprovante?'📎 Ver':'📎 Comprovante';
+  chip.onclick=()=>fi.click();
+  fi.onchange=()=>{
+    const f=fi.files[0]; if(!f) return;
+    if(f.size>5*1024*1024){toast('Arquivo > 5MB','error');return;}
+    const reader=new FileReader();
+    reader.onload=e=>{onComp(e.target.result); chip.className='up-chip has-file'; chip.innerHTML='📎 Salvo ✓';};
+    reader.readAsDataURL(f);
+  };
+
+  const actions=document.createElement('div'); actions.className='pipe-actions';
+  actions.append(sel, chip, fi);
+
+  row.append(info, valInp, actions);
+  return row;
+}
+
+// ─── DRE / VENDA ───
+async function renderDRE(main, meta) {
+  main.innerHTML = '';
+  const ficha=await getFicha(meta.id);
+
+  // Calcular custos totais acumulados de todos os meses
+  const allPipe=await ls.get(SK.pipeline)||{};
+  const propPipe=allPipe[meta.id]||{};
+  let custosTotais=0;
+  for (const ym in propPipe) for (const k in propPipe[ym].custos) custosTotais+=Number(propPipe[ym].custos[k].valor)||0;
+
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML='<div class="card-hdr"><div class="card-title">💰 DRE — Análise de Venda / Rentabilidade</div></div><div class="card-body"></div>';
+  const body=card.querySelector('.card-body');
+
+  const fields=[
+    {key:'custo_aquisicao', label:'Custo de aquisição (R$)', val: ficha.custo_aquisicao ?? meta.custoAquisicao, type:'number'},
+    {key:'valor_venda', label:'Valor de venda (R$)', val: ficha.valor_venda||'', type:'number', placeholder:'Preencher quando vender'},
+    {key:'itbi', label:'ITBI pago (R$)', val: ficha.itbi||'', type:'number'},
+    {key:'comissao_imob', label:'Comissão imobiliária (R$)', val: ficha.comissao_imob||'', type:'number'},
+    {key:'outros_custos_venda', label:'Outros custos de venda (R$)', val: ficha.outros_custos_venda||'', type:'number'},
+    {key:'data_venda', label:'Data da venda', val: ficha.data_venda||'', type:'date'},
+  ];
+
+  for (const f of fields) {
+    const fg=document.createElement('div'); fg.className='fg';
+    fg.innerHTML=`<label class="fl">${f.label}</label>`;
+    const inp=document.createElement('input'); inp.type=f.type||'text'; inp.className='fi';
+    inp.value=f.val||''; if(f.placeholder) inp.placeholder=f.placeholder;
+    inp.onchange=async ()=>{ficha[f.key]=f.type==='number'?(parseFloat(inp.value.replace(',','.'))||0):inp.value; await saveFicha(meta.id,ficha); renderDRE(main,meta);};
+    fg.appendChild(inp); body.appendChild(fg);
+  }
+
+  // DRE calculation
+  const venda=Number(ficha.valor_venda)||0;
+  const aquisicao=Number(ficha.custo_aquisicao||meta.custoAquisicao)||0;
+  const itbi=Number(ficha.itbi)||0;
+  const comissao=Number(ficha.comissao_imob)||0;
+  const outrosCustos=Number(ficha.outros_custos_venda)||0;
+  const ganhoCapital=Math.max(0, venda - aquisicao);
+  const irGanhoCapital = ganhoCapital > 0 ? ganhoCapital * 0.15 : 0; // 15% PF
+  const lucroLiquido = venda - aquisicao - itbi - comissao - outrosCustos - custosTotais - irGanhoCapital;
+
+  if (venda > 0) {
+    const dre=document.createElement('div'); dre.style.marginTop='20px';
+    dre.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--border)">Demonstrativo de Resultado</div>`;
+    const rows=[
+      {label:'(+) Valor de venda', val:venda, cls:'tg'},
+      {label:'(-) Custo de aquisição', val:-aquisicao, cls:'tr'},
+      {label:'(-) Custos acumulados (manutenção, IPTU, etc)', val:-custosTotais, cls:'tr'},
+      {label:'(-) ITBI', val:-itbi, cls:'tr'},
+      {label:'(-) Comissão imobiliária', val:-comissao, cls:'tr'},
+      {label:'(-) Outros custos de venda', val:-outrosCustos, cls:'tr'},
+      {label:'(-) IR sobre ganho de capital (15%)', val:-irGanhoCapital, cls:'tr'},
+      {label:'= Lucro Líquido', val:lucroLiquido, cls:lucroLiquido>=0?'tg':'tr', total:true},
+    ];
+    for (const r of rows) {
+      const d=document.createElement('div'); d.className='dre-row'+(r.total?' total':'');
+      d.innerHTML=`<span>${r.label}</span><span class="${r.cls}">${fmt(Math.abs(r.val))} ${r.val<0&&!r.total?'':''}${r.val>=0&&!r.total?'(receita)':r.val<0&&!r.total?'(custo)':''}</span>`;
+      dre.appendChild(d);
+    }
+    const pct=(lucroLiquido/aquisicao*100).toFixed(1);
+    const pctEl=document.createElement('div'); pctEl.style.cssText='margin-top:12px;padding:12px 16px;background:#f0fdf4;border-radius:8px;font-size:13px;font-weight:600;color:#065f46';
+    pctEl.textContent=`Retorno sobre investimento: ${pct}%`;
+    dre.appendChild(pctEl);
+    body.appendChild(dre);
+  } else {
+    const al=document.createElement('div'); al.className='alert alert-info'; al.style.marginTop='16px';
+    al.innerHTML=`<div class="alert-icon">ℹ️</div><div>Preencha o valor de venda para ver o DRE completo. Custos acumulados já registrados: <strong>${fmt(custosTotais)}</strong></div>`;
+    body.appendChild(al);
+  }
+  main.appendChild(card);
+}
+
+// ─── HISTÓRICO ───
+async function renderPropHistorico(main, meta) {
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML='<div class="card-hdr"><div class="card-title">📊 Histórico — Últimos 12 meses</div></div><div style="overflow-x:auto"><table class="htbl"><thead><tr><th>Mês</th><th>Entradas</th><th>Saídas</th><th>Resultado</th><th>Status</th></tr></thead><tbody id="hb"></tbody></table></div>';
+  const tb=card.querySelector('#hb');
+  for (let i=11;i>=0;i--) {
+    const ym=addM(S.month,-i), t=await computeTotals(meta.id,ym), ps=await pipelineStatus(meta.id,ym);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${fmtSh(ym)}${ym===S.month?' <strong>(atual)</strong>':''}</td>
+    <td class="${t.entradas>0?'tg':'tm'}">${fmt(t.entradas)}</td>
+    <td class="${t.saidas>0?'tr':'tm'}">${fmt(t.saidas)}</td>
+    <td class="${t.net>0?'tg':t.net<0?'tr':'tm'}">${fmt(t.net)}</td>
+    <td>${ps.pendente===0?'<span class="badge b-ok">✓</span>':`<span class="badge b-pend">${ps.pendente} pendentes</span>`}</td>`;
+    tb.appendChild(tr);
+  }
+  main.appendChild(card);
+}
+
+// ─── DOCUMENTOS POR IMÓVEL ───
+async function renderPropDocs(main, meta) {
+  main.innerHTML = '';
+  const docs = await getPropDocs(meta.id);
+  const done = docs.filter(d => d.done).length;
+  const pct = docs.length ? Math.round(done / docs.length * 100) : 100;
+  const pc = pct === 100 ? 'green' : pct > 50 ? 'yellow' : 'red';
+  const criticos = docs.filter(d => d.prio === 'critico' && !d.done).length;
+
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr">
+    <div class="card-title">📄 Checklist de Documentos</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      ${criticos > 0 ? `<span class="prio-critico">⚠ ${criticos} crítico${criticos>1?'s':''}</span>` : ''}
+      <span class="badge ${pct===100?'b-ok':pct>50?'b-parcial':'b-pend'}">${done}/${docs.length}</span>
+    </div>
+  </div><div class="card-body">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-soft);margin-bottom:4px"><span>Progresso</span><span>${pct}%</span></div>
+    <div class="prog-bg"><div class="prog-fill ${pc}" style="width:${pct}%"></div></div>
+  </div>`;
+  const body = card.querySelector('.card-body');
+
+  async function redrawDocs() {
+    body.querySelectorAll('.doc-section').forEach(e => e.remove());
+
+    // Agrupar por categoria
+    const cats = [...new Set(docs.map(d => d.cat || 'Geral'))];
+    for (const cat of cats) {
+      const catDocs = docs.filter(d => (d.cat || 'Geral') === cat);
+      const sec = document.createElement('div'); sec.className = 'doc-section'; sec.style.marginTop = '14px';
+
+      const catHdr = document.createElement('div'); catHdr.className = 'doc-cat-hdr';
+      const catDone = catDocs.filter(d => d.done).length;
+      catHdr.innerHTML = `<span>${cat}</span><span class="badge ${catDone===catDocs.length?'b-ok':catDone>0?'b-parcial':'b-pend'}" style="font-size:10px">${catDone}/${catDocs.length}</span>`;
+      sec.appendChild(catHdr);
+
+      for (let i = 0; i < docs.length; i++) {
+        const d = docs[i];
+        if ((d.cat || 'Geral') !== cat) continue;
+
+        const row = document.createElement('div'); row.className = 'doc-row';
+
+        // Checkbox
+        const ck = document.createElement('div'); ck.className = 'doc-ck' + (d.done ? ' done' : ''); ck.innerHTML = d.done ? '✓' : '';
+        ck.onclick = async () => { docs[i].done = !docs[i].done; await savePropDocs(meta.id, docs); redrawDocs(); renderSidebar(); };
+
+        // Info
+        const info = document.createElement('div'); info.className = 'doc-info';
+        const lbl = document.createElement('div'); lbl.className = 'doc-lbl' + (d.done ? ' crossed' : ''); lbl.textContent = d.label;
+        lbl.onclick = async () => { docs[i].done = !docs[i].done; await savePropDocs(meta.id, docs); redrawDocs(); renderSidebar(); };
+
+        const meta2 = document.createElement('div'); meta2.className = 'doc-meta';
+        meta2.innerHTML = `<span class="prio-${d.prio}">${d.prio === 'critico' ? '🔴 Crítico' : d.prio === 'importante' ? '🟡 Importante' : '⚪ Normal'}</span>`;
+        if (d.arquivo) meta2.innerHTML += `<span class="up-chip has-file" style="cursor:pointer" onclick="viewDocFile(${i})">📎 Arquivo</span>`;
+        if (d.validade) meta2.innerHTML += `<span style="font-size:11px;color:var(--text-muted)">Validade: ${d.validade}</span>`;
+        if (d.obs) meta2.innerHTML += `<span style="font-size:11px;color:var(--text-soft);font-style:italic">${d.obs}</span>`;
+        info.append(lbl, meta2);
+
+        // Actions
+        const actions = document.createElement('div'); actions.className = 'doc-actions';
+
+        // Validade input
+        const valInp = document.createElement('input'); valInp.type = 'date'; valInp.className = 'doc-val-inp'; valInp.title = 'Validade do documento';
+        valInp.value = d.validade || '';
+        valInp.onchange = async () => { docs[i].validade = valInp.value; await savePropDocs(meta.id, docs); redrawDocs(); };
+
+        // Obs input
+        const obsInp = document.createElement('input'); obsInp.type = 'text'; obsInp.className = 'doc-obs-inp'; obsInp.placeholder = 'Obs...';
+        obsInp.value = d.obs || '';
+        obsInp.onchange = async () => { docs[i].obs = obsInp.value; await savePropDocs(meta.id, docs); toast('Obs salvo'); };
+
+        // Upload arquivo
+        const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*,.pdf'; fi.style.display = 'none';
+        const upBtn = document.createElement('div'); upBtn.className = 'up-chip' + (d.arquivo ? ' has-file' : ''); upBtn.innerHTML = d.arquivo ? '📎 Salvo' : '📎';
+        upBtn.title = 'Anexar documento';
+        upBtn.onclick = () => fi.click();
+        fi.onchange = async () => {
+          const f = fi.files[0]; if (!f) return;
+          if (f.size > 4 * 1024 * 1024) { toast('Arquivo maior que 4MB', 'error'); return; }
+          const reader = new FileReader();
+          reader.onload = async e => {
+            docs[i].arquivo = { name: f.name, data: e.target.result };
+            await savePropDocs(meta.id, docs); redrawDocs(); toast('Arquivo anexado');
+          };
+          reader.readAsDataURL(f);
+        };
+
+        // Ver arquivo
+        if (d.arquivo) {
+          const viewBtn = document.createElement('button'); viewBtn.className = 'btn btn-ghost btn-xs'; viewBtn.innerHTML = '👁';
+          viewBtn.title = 'Ver arquivo';
+          viewBtn.onclick = () => {
+            const a = document.createElement('a'); a.href = d.arquivo.data; a.target = '_blank'; a.download = d.arquivo.name; a.click();
+          };
+          actions.appendChild(viewBtn);
+        }
+
+        const delBtn = document.createElement('button'); delBtn.className = 'btn btn-ghost btn-xs'; delBtn.innerHTML = '×'; delBtn.title = 'Remover';
+        delBtn.onclick = async () => { if (!confirm('Remover este documento?')) return; docs.splice(i, 1); await savePropDocs(meta.id, docs); renderPropDocs(main, meta); };
+
+        actions.append(valInp, obsInp, upBtn, fi, delBtn);
+        row.append(ck, info, actions);
+        sec.appendChild(row);
+      }
+      body.appendChild(sec);
+    }
+
+    // Adicionar novo documento
+    const addSection = document.createElement('div'); addSection.className = 'doc-section'; addSection.style.cssText = 'margin-top:16px;padding-top:12px;border-top:1px solid var(--border)';
+    const addRow = document.createElement('div'); addRow.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;align-items:center';
+    const ni = document.createElement('input'); ni.className = 'fi'; ni.placeholder = 'Nome do documento...'; ni.style.flex = '1;min-width:160px';
+    const catSel = document.createElement('select'); catSel.className = 'isel';
+    ['Base','Condomínio','Locação','Financiamento','Venda','Operação','Rural','Terreno','Outro'].forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; catSel.appendChild(o); });
+    const prioSel = document.createElement('select'); prioSel.className = 'isel';
+    [{v:'critico',l:'🔴 Crítico'},{v:'importante',l:'🟡 Importante'},{v:'normal',l:'⚪ Normal'}].forEach(p => { const o = document.createElement('option'); o.value = p.v; o.textContent = p.l; prioSel.appendChild(o); });
+    const ab = document.createElement('button'); ab.className = 'btn btn-primary btn-sm'; ab.innerHTML = '+ Adicionar';
+    ab.onclick = async () => {
+      if (!ni.value.trim()) return;
+      docs.push({ id: 'custom_' + Date.now(), cat: catSel.value, label: ni.value.trim(), prio: prioSel.value, done: false, arquivo: null, validade: '', obs: '' });
+      await savePropDocs(meta.id, docs); ni.value = ''; renderPropDocs(main, meta); toast('Documento adicionado');
+    };
+    addRow.append(ni, catSel, prioSel, ab);
+    addSection.appendChild(addRow);
+    body.appendChild(addSection);
+  }
+
+  redrawDocs();
+  main.appendChild(card);
+
+  // Obs jurídicas
+  const ficha = await getFicha(meta.id);
+  const nc = document.createElement('div'); nc.className = 'card';
+  nc.innerHTML = '<div class="card-hdr"><div class="card-title">📝 Obs. Jurídicas / Cartório</div></div><div class="card-body"></div>';
+  const nb = nc.querySelector('.card-body');
+  const ta = document.createElement('textarea'); ta.className = 'fi'; ta.rows = 4; ta.placeholder = 'Situação no cartório, advogado, inventário, pendências de registro...';
+  ta.value = ficha.obs_juridica || '';
+  ta.onchange = async () => { ficha.obs_juridica = ta.value; await saveFicha(meta.id, ficha); toast('Salvo'); };
+  nb.appendChild(ta);
+  main.appendChild(nc);
+}
+
+// ═══════════════════════════════════════
+// PIPELINE GERAL
+// ═══════════════════════════════════════
+async function renderPipelineGeral(main) {
+  main.innerHTML='';
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML='<div><div class="pg-title">🔄 Pipeline Geral</div><div class="pg-sub">Todos os pagamentos e recebimentos do mês</div></div>';
+  ph.appendChild(await mkMN()); main.appendChild(ph);
+
+  const ym=S.month;
+  let totalPend=0, totalPago=0, totalRec=0, totalAguard=0;
+
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML='<div class="card-hdr"><div class="card-title">Visão Consolidada</div></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Imóvel</th><th>Item</th><th>Tipo</th><th class="num">Valor</th><th>Status</th><th>Comprovante</th></tr></thead><tbody id="pg-tb"></tbody></table></div>';
+  main.appendChild(card);
+
+  const tb=card.querySelector('#pg-tb');
+  for (const m of PROPS) {
+    const pipe=await getPipeline(m.id,ym);
+
+    for (const e of (m.entradas||[])) {
+      const ed=pipe.entradas[e.id]||{valor:0,status:'aguardando',comprovante:null};
+      if(ed.status==='recebido') totalRec+=Number(ed.valor)||0; else totalAguard+=Number(ed.valor)||0;
+      const tr=document.createElement('tr'); tr.className='clickable';
+      const sB=ed.status==='recebido'?'<span class="badge b-pago">✓ Recebido</span>':ed.status==='verificado'?'<span class="badge b-aguar">Verificado</span>':'<span class="badge b-pend">Aguardando</span>';
+      tr.innerHTML=`<td>${m.icon} ${m.name}</td><td>${e.label}</td><td><span class="badge b-entrada">Entrada</span></td><td class="num tg">${fmt(ed.valor)}</td><td>${sB}</td><td>${ed.comprovante?'<span class="badge b-ok">📎 OK</span>':'<span class="tm">—</span>'}</td>`;
+      tr.onclick=()=>navigate(m.id); tb.appendChild(tr);
+    }
+    for (const c of (m.custos||[]).filter(c=>c.tipo!=='info')) {
+      const cd=pipe.custos[c.id]||{valor:0,status:'aberto',comprovante:null};
+      if(cd.status==='pago') totalPago+=Number(cd.valor)||0; else totalPend+=Number(cd.valor)||0;
+      const tr=document.createElement('tr'); tr.className='clickable';
+      const sB=cd.status==='pago'?'<span class="badge b-pago">✓ Pago</span>':cd.status==='boleto_ok'?'<span class="badge b-aguar">Boleto OK</span>':'<span class="badge b-pend">Em aberto</span>';
+      tr.innerHTML=`<td>${m.icon} ${m.name}</td><td>${c.label}</td><td><span class="badge b-pend">Saída</span></td><td class="num tr">${fmt(cd.valor)}</td><td>${sB}</td><td>${cd.comprovante?'<span class="badge b-ok">📎 OK</span>':'<span class="tm">—</span>'}</td>`;
+      tr.onclick=()=>navigate(m.id); tb.appendChild(tr);
+    }
+  }
+
+  // Summary kpis
+  const kg=document.createElement('div'); kg.className='kpi-grid'; kg.style.marginTop='16px';
+  [{label:'Recebido',val:fmt(totalRec),cls:'green'},{label:'A Receber',val:fmt(totalAguard),cls:'yellow'},{label:'Pago',val:fmt(totalPago),cls:'blue'},{label:'A Pagar',val:fmt(totalPend),cls:'red'}]
+    .forEach(k=>{const c=document.createElement('div');c.className='kpi '+k.cls;c.innerHTML=`<div class="kpi-lbl">${k.label}</div><div class="kpi-val ${k.cls}">${k.val}</div>`;kg.appendChild(c);});
+  main.appendChild(kg);
+}
+
+// ═══════════════════════════════════════
+// AGENDA
+// ═══════════════════════════════════════
+async function renderAgenda(main) {
+  main.innerHTML='';
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML='<div><div class="pg-title">📅 Agenda de Obrigações</div><div class="pg-sub">Vencimentos e tarefas</div></div>';
+  main.appendChild(ph);
+
+  const ym=S.month;
+  const items=[];
+
+  for (const m of PROPS) {
+    if (!m.baloes) continue;
+    for (const b of m.baloes) if (b.mes>=ym && b.mes<=addM(ym,3)) {
+      const [y,mo]=b.mes.split('-');
+      items.push({date:`${y}-${mo}-10`,title:`Balão — ${m.name}`,sub:fmt(b.valor),urgency:b.mes===ym?'urgent':'warn'});
+    }
+  }
+  items.push({date:'2027-07-01',title:'Quitação — Casa Mirabelle',sub:'Término do parcelamento',urgency:'ok'});
+  items.push({date:'2028-12-01',title:'Quitação — Ap Meia Praia',sub:'Último balão',urgency:'ok'});
+  for (const m of PROPS.filter(p=>p.situacaoJuridica==='pendente'))
+    items.push({date:ym+'-01',title:`Regularizar — ${m.name}`,sub:'Doc. pendente',urgency:'urgent'});
+
+  const saved=await ls.get(SK.agenda)||[];
+  const all=[...items,...saved].sort((a,b)=>a.date.localeCompare(b.date));
+
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML='<div class="card-hdr"><div class="card-title">Próximos eventos</div><button class="btn btn-primary btn-sm" id="add-ag">+ Adicionar</button></div><div class="card-body" id="ag-body"></div>';
+  const body=card.querySelector('#ag-body');
+
+  for (const item of all) {
+    const [y,m,d]=(item.date||ym+'-01').split('-');
+    const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #f8fafc';
+    const box=document.createElement('div');
+    box.style.cssText=`width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;background:${item.urgency==='urgent'?'#fee2e2':item.urgency==='warn'?'#fef3c7':'#d1fae5'};color:${item.urgency==='urgent'?'#b91c1c':item.urgency==='warn'?'#b45309':'#065f46'}`;
+    box.innerHTML=`<div style="font-size:15px;font-weight:800">${d||'--'}</div><div style="font-size:10px;font-weight:700;text-transform:uppercase">${(MONTHS_SH[(+m||1)-1])||'--'}</div>`;
+    const info=document.createElement('div'); info.style.flex='1';
+    info.innerHTML=`<div style="font-size:13px;font-weight:700">${item.title}</div><div style="font-size:12px;color:var(--text-soft);margin-top:2px">${item.sub||''}</div>`;
+    row.append(box,info); body.appendChild(row);
+  }
+  main.appendChild(card);
+
+  card.querySelector('#add-ag').onclick=async ()=>{
+    const modal=document.createElement('div'); modal.className='modal-bg';
+    modal.innerHTML=`<div class="modal"><div class="modal-title">+ Nova Obrigação</div>
+    <div class="fg"><label class="fl">Título</label><input id="ag-t" class="fi" placeholder="Ex: Renovar contrato"></div>
+    <div class="fg"><label class="fl">Data</label><input id="ag-d" class="fi" type="date"></div>
+    <div class="fg"><label class="fl">Detalhe</label><input id="ag-s" class="fi" placeholder="Valor, contato..."></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-outline" id="ag-c">Cancelar</button><button class="btn btn-primary" id="ag-sv">Salvar</button></div></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('#ag-c').onclick=()=>modal.remove();
+    modal.querySelector('#ag-sv').onclick=async ()=>{
+      const t=modal.querySelector('#ag-t').value.trim(), d=modal.querySelector('#ag-d').value, s=modal.querySelector('#ag-s').value.trim();
+      if(!t||!d){toast('Preencha título e data','error');return;}
+      const sv=await ls.get(SK.agenda)||[]; sv.push({id:Date.now(),title:t,date:d,sub:s,urgency:'warn'});
+      await ls.set(SK.agenda,sv); modal.remove(); toast('Evento adicionado'); renderAgenda(main);
+    };
+  };
+}
+
+// ═══════════════════════════════════════
+// DOCUMENTOS CENTRAL
+// ═══════════════════════════════════════
+async function renderDocumentos(main) {
+  main.innerHTML = '';
+  const ph = document.createElement('div'); ph.className = 'pg-hdr';
+  ph.innerHTML = '<div><div class="pg-title">📁 Central de Documentos</div><div class="pg-sub">Status completo por imóvel</div></div>';
+  main.appendChild(ph);
+
+  let td = 0, tOk = 0, tCrit = 0, tArq = 0;
+  for (const m of PROPS) {
+    const d = await getPropDocs(m.id);
+    td += d.length; tOk += d.filter(x => x.done).length;
+    tCrit += d.filter(x => x.prio === 'critico' && !x.done).length;
+    tArq += d.filter(x => x.arquivo).length;
+  }
+  const pct = td ? Math.round(tOk / td * 100) : 0;
+
+  const kg = document.createElement('div'); kg.className = 'kpi-grid'; kg.style.marginBottom = '20px';
+  [
+    {label:'Docs Verificados', val:`${tOk}/${td}`, cls:'green', sub:`${pct}% do portfólio OK`},
+    {label:'Críticos Pendentes', val:tCrit, cls:tCrit>0?'red':'green', sub:'Precisam atenção urgente'},
+    {label:'Arquivos Anexados', val:tArq, cls:'blue', sub:'Documentos digitalizados'},
+    {label:'Imóveis Regulares', val:PROPS.filter(p=>p.situacaoJuridica==='ok').length, cls:'purple', sub:`de ${PROPS.length} imóveis`},
+  ].forEach(k => { const c = document.createElement('div'); c.className = 'kpi ' + k.cls; c.innerHTML = `<div class="kpi-lbl">${k.label}</div><div class="kpi-val ${k.cls}">${k.val}</div><div class="kpi-sub">${k.sub}</div>`; kg.appendChild(c); });
+  main.appendChild(kg);
+
+  // Alerta de críticos
+  const allCrit = [];
+  for (const m of PROPS) {
+    const d = await getPropDocs(m.id);
+    const critPend = d.filter(x => x.prio === 'critico' && !x.done);
+    if (critPend.length) allCrit.push({m, docs: critPend});
+  }
+  if (allCrit.length) {
+    const al = document.createElement('div'); al.className = 'alert alert-danger'; al.style.marginBottom = '16px';
+    al.innerHTML = `<div class="alert-icon">🚨</div><div><div class="alert-title">${tCrit} documentos críticos pendentes</div><div style="font-size:12px;margin-top:4px">${allCrit.map(x=>`<strong>${x.m.name}</strong>: ${x.docs.map(d=>d.label).join(', ')}`).join(' · ')}</div></div>`;
+    main.appendChild(al);
+  }
+
+  // Tabela por imóvel
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr"><div class="card-title">Status por Imóvel</div></div><div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>Imóvel</th><th>Cidade/UF</th><th>Progresso</th><th class="num">OK</th><th class="num">Críticos</th><th class="num">Arquivos</th><th>Situação</th><th></th></tr></thead>
+    <tbody id="docs-tb"></tbody></table></div>`;
+  main.appendChild(card);
+
+  const tb = card.querySelector('#docs-tb');
+  for (const m of PROPS) {
+    const docs = await getPropDocs(m.id);
+    const done = docs.filter(d => d.done).length;
+    const crit = docs.filter(d => d.prio === 'critico' && !d.done).length;
+    const arqs = docs.filter(d => d.arquivo).length;
+    const pct2 = docs.length ? Math.round(done / docs.length * 100) : 100;
+    const pc = pct2 === 100 ? 'green' : pct2 > 50 ? 'yellow' : 'red';
+    const tr = document.createElement('tr'); tr.className = 'clickable';
+    tr.innerHTML = `
+      <td><span style="margin-right:6px">${m.icon}</span><strong>${m.name}</strong></td>
+      <td class="tm">${m.city}, ${m.state}</td>
+      <td style="min-width:100px">
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">${pct2}%</div>
+        <div class="prog-bg" style="height:6px"><div class="prog-fill ${pc}" style="width:${pct2}%"></div></div>
+      </td>
+      <td class="num"><span class="badge ${done===docs.length?'b-ok':'b-parcial'}">${done}/${docs.length}</span></td>
+      <td class="num">${crit > 0 ? `<span class="prio-critico">${crit}</span>` : '<span class="tm">—</span>'}</td>
+      <td class="num">${arqs > 0 ? `<span class="badge b-entrada">📎 ${arqs}</span>` : '<span class="tm">—</span>'}</td>
+      <td><span class="badge ${m.situacaoJuridica==='ok'?'b-ok':m.situacaoJuridica==='parcial'?'b-parcial':'b-pend'}">${m.situacaoJuridica==='ok'?'✓ OK':m.situacaoJuridica==='parcial'?'⚠ Parcial':'✕ Pendente'}</span></td>
+      <td><button class="btn btn-outline btn-sm" style="white-space:nowrap">Ver docs ›</button></td>`;
+    tr.querySelector('button').onclick = async () => { navigate(m.id); setTimeout(async () => { S.tab = 'documentos'; await renderMain(); }, 50); };
+    tr.onclick = e => { if (e.target.tagName === 'BUTTON') return; navigate(m.id); setTimeout(async () => { S.tab = 'documentos'; await renderMain(); }, 50); };
+    tb.appendChild(tr);
+  }
+}
+
+// ═══════════════════════════════════════
+// EXTRATO
+// ═══════════════════════════════════════
+async function renderExtrato(main) {
+  main.innerHTML='';
+  const ym=S.month;
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML='<div><div class="pg-title">💳 Extrato Sicredi</div><div class="pg-sub">Conciliação com os imóveis</div></div>';
+  ph.appendChild(await mkMN()); main.appendChild(ph);
+
+  const infoCard=document.createElement('div'); infoCard.className='alert alert-info'; infoCard.style.marginBottom='16px';
+  infoCard.innerHTML=`<div class="alert-icon">🏦</div><div><div class="alert-title">Conta Sicredi — acesso leitura</div>Importe o extrato do mês em formato .OFX ou .CSV para conciliar com os imóveis. A assistente deve verificar entradas no app e trazer comprovantes.</div>`;
+  main.appendChild(infoCard);
+
+  const uc=document.createElement('div'); uc.className='card';
+  const ua=document.createElement('div'); ua.className='up-area';
+  ua.innerHTML=`<div style="font-size:34px;margin-bottom:8px">📤</div><p><strong>Arraste o extrato aqui</strong> ou clique para selecionar</p><p style="font-size:12px;color:var(--text-muted);margin-top:5px">.OFX · .CSV — Nubank, Inter, C6, Sicredi</p>`;
+  const fi=document.createElement('input'); fi.type='file'; fi.accept='.ofx,.csv,.txt'; fi.style.display='none';
+  ua.onclick=()=>fi.click();
+  ua.ondragover=e=>{e.preventDefault();ua.classList.add('over');};
+  ua.ondragleave=()=>ua.classList.remove('over');
+  ua.ondrop=e=>{e.preventDefault();ua.classList.remove('over');if(e.dataTransfer.files[0]) processExt(e.dataTransfer.files[0],ym,()=>renderExtrato(main));};
+  fi.onchange=()=>{if(fi.files[0]) processExt(fi.files[0],ym,()=>renderExtrato(main));};
+  uc.append(ua,fi); main.appendChild(uc);
+
+  const txs=((await ls.get(SK.extrato))||{})[ym]||[];
+  if (!txs.length) { const em=document.createElement('div'); em.className='card'; em.innerHTML='<div class="empty"><div class="ei">📄</div><div class="et">Nenhuma transação importada</div></div>'; main.appendChild(em); return; }
+
+  const done=txs.filter(t=>t.conciliado).length;
+  const cnt=document.createElement('div'); cnt.style.cssText='margin-bottom:12px;font-size:13px;color:var(--text-soft)';
+  cnt.innerHTML=`<span class="concil-badge">✓ ${done}</span> de <strong>${txs.length}</strong> transações conciliadas`;
+  main.appendChild(cnt);
+
+  const tc=document.createElement('div'); tc.className='card';
+  tc.innerHTML=`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Data</th><th>Descrição</th><th class="num">Valor</th><th>Tipo</th><th>Imóvel</th><th>Ação</th></tr></thead><tbody id="ext-tb"></tbody></table></div>`;
+  main.appendChild(tc);
+
+  const tb=tc.querySelector('#ext-tb');
+  for (const tx of txs) {
+    const tr=document.createElement('tr'); if(tx.conciliado) tr.style.opacity='0.5';
+    const linked=PROPS.find(m=>m.id===tx.propId);
+    let sugg=null;
+    if(tx.type==='credit'&&!tx.conciliado) for(const m of PROPS) if(m.custos){/* find by aluguel */}
+
+    const tdP=document.createElement('td');
+    if (tx.conciliado) { tdP.innerHTML=`<span class="tm">✓ ${linked?linked.name:'—'}</span>`; }
+    else {
+      const sel=document.createElement('select'); sel.className='isel';
+      sel.innerHTML='<option value="">— Selecionar —</option>'+PROPS.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+      tdP.appendChild(sel);
+      const tdA=document.createElement('td');
+      const reg=document.createElement('button'); reg.className='btn btn-primary btn-xs'; reg.textContent='Registrar';
+      reg.onclick=async ()=>{
+        if(!sel.value){toast('Selecione um imóvel','error');return;}
+        const ed=await ls.get(SK.extrato)||{}; const idx=(ed[ym]||[]).findIndex(t=>t.id===tx.id);
+        if(idx>=0){ed[ym][idx].propId=sel.value;ed[ym][idx].conciliado=true;await ls.set(SK.extrato,ed);toast('Conciliado!');await renderExtrato(main);}
+      };
+      tdA.appendChild(reg);
+      tr.innerHTML=`<td>${tx.date}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${tx.desc}</td><td class="num ${tx.type==='credit'?'tg':'tr'}">${tx.type==='credit'?'+':'-'}${fmt(tx.amount)}</td><td>${tx.type==='credit'?'<span class="badge b-ok">Crédito</span>':'<span class="badge b-pend">Débito</span>'}</td>`;
+      tr.appendChild(tdP);tr.appendChild(tdA);tb.appendChild(tr);continue;
+    }
+    tr.innerHTML=`<td>${tx.date}</td><td>${tx.desc}</td><td class="num ${tx.type==='credit'?'tg':'tr'}">${tx.type==='credit'?'+':'-'}${fmt(tx.amount)}</td><td>${tx.type==='credit'?'<span class="badge b-ok">Crédito</span>':'<span class="badge b-pend">Débito</span>'}</td>`;
+    tr.appendChild(tdP); const tdA2=document.createElement('td'); tdA2.innerHTML='<span class="tm">✓</span>'; tr.appendChild(tdA2); tb.appendChild(tr);
+  }
+}
+
+function parseOFX(t){const txs=[];const bl=t.split('<STMTTRN>').slice(1);for(const b of bl){const g=x=>{const m=b.match(new RegExp('<'+x+'>([^<\\n\\r]+)','i'));return m?m[1].trim():'';};const dr=g('DTPOSTED'),date=dr.length>=8?dr.slice(6,8)+'/'+dr.slice(4,6)+'/'+dr.slice(0,4):dr,ar=g('TRNAMT'),amount=Math.abs(parseFloat(ar)||0),type=(g('TRNTYPE').toLowerCase()==='credit'||parseFloat(ar)>0)?'credit':'debit',memo=g('MEMO')||g('NAME')||'';if(amount>0)txs.push({id:Date.now()+Math.random(),date,desc:memo,amount,type,propId:null,conciliado:false});}return txs;}
+function parseCSV(t){const lines=t.trim().split('\n').map(l=>l.trim()).filter(Boolean);if(!lines.length)return{bank:'?',txs:[]};const h=lines[0].toLowerCase();let bank='Genérico',sep=',',di=0,dsc=1,ai=2;if(h.includes('data lan')||h.includes('data lan')){bank='Inter';sep=';';const c=lines[0].split(sep).map(x=>x.toLowerCase().trim());di=c.findIndex(x=>x.includes('data'));dsc=c.findIndex(x=>x.includes('hist')||x.includes('desc'));ai=c.findIndex(x=>x.includes('valor'));}else if(h.includes('date')&&h.includes('title')){bank='Nubank';sep=',';const c=lines[0].split(sep).map(x=>x.toLowerCase().trim());di=c.findIndex(x=>x.includes('date'));dsc=c.findIndex(x=>x.includes('title'));ai=c.findIndex(x=>x.includes('amount'));}else{sep=h.includes(';')?';':',';}const txs=[];for(let i=1;i<lines.length;i++){const c=lines[i].split(sep);if(c.length<=Math.max(di,dsc,ai))continue;const date=(c[di]||'').replace(/"/g,'').trim(),desc=(c[dsc]||'').replace(/"/g,'').trim(),as=(c[ai]||'').replace(/"/g,'').replace('.','').replace(',','.').trim(),av=parseFloat(as)||0,amount=Math.abs(av);if(!amount)continue;txs.push({id:Date.now()+Math.random(),date,desc,amount,type:av>=0?'credit':'debit',propId:null,conciliado:false});}return{bank,txs};}
+function processExt(file,ym,cb){const r=new FileReader();r.onload=async e=>{const txt=e.target.result;let txs=[],bank='';if(file.name.endsWith('.ofx')){txs=parseOFX(txt);bank='OFX';}else{const res=parseCSV(txt);txs=res.txs;bank=res.bank;}if(!txs.length){toast('Nenhuma transação','error');return;}const ed=await ls.get(SK.extrato)||{};ed[ym]=txs;await ls.set(SK.extrato,ed);toast(txs.length+' transações ('+bank+')');cb();};r.readAsText(file,'latin1');}
+
+// ═══════════════════════════════════════
+// CONTATOS POR IMÓVEL
+// ═══════════════════════════════════════
+async function renderPropContatos(main, meta) {
+  main.innerHTML = '';
+  const contatos = await getContatos(meta.id);
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr"><div class="card-title">📞 Contatos do Imóvel</div><button class="btn btn-primary btn-sm" id="add-cont">+ Adicionar</button></div><div class="card-body" id="cont-body"></div>`;
+  main.appendChild(card);
+  function redraw() {
+    const body = card.querySelector('#cont-body'); body.innerHTML = '';
+    if (!contatos.length) { body.innerHTML = '<div class="empty"><div class="ei">📞</div><div class="et">Nenhum contato cadastrado</div></div>'; return; }
+    for (let i = 0; i < contatos.length; i++) {
+      const c = contatos[i];
+      const row = document.createElement('div'); row.className = 'contact-row';
+      row.innerHTML = `<div class="contact-avatar">${c.emoji||'👤'}</div>
+        <div class="contact-info">
+          <div class="contact-role">${c.papel||'Contato'}</div>
+          <div class="contact-name">${c.nome}</div>
+          <div class="contact-detail">${c.telefone||''} ${c.email?'· '+c.email:''}</div>
+          ${c.obs?`<div style="font-size:11px;color:var(--text-muted);font-style:italic;margin-top:2px">${c.obs}</div>`:''}
+        </div>
+        <button class="btn btn-ghost btn-xs" onclick="editContato(${i})">✏</button>
+        <button class="btn btn-ghost btn-xs" onclick="delContato(${i})">×</button>`;
+      if (c.telefone) {
+        const btn = document.createElement('a'); btn.href = `tel:${c.telefone.replace(/\D/g,'')}`;
+        btn.className = 'btn btn-outline btn-xs'; btn.innerHTML = '📱'; btn.style.textDecoration = 'none';
+        row.appendChild(btn);
+      }
+      body.appendChild(row);
+    }
+  }
+  window.editContato = (i) => openContatoModal(contatos, i, meta.id, redraw);
+  window.delContato = async (i) => { if(!confirm('Remover contato?')) return; contatos.splice(i,1); await saveContatos(meta.id,contatos); redraw(); };
+  card.querySelector('#add-cont').onclick = () => openContatoModal(contatos, -1, meta.id, redraw);
+  redraw();
+}
+
+async function openContatoModal(contatos, idx, pid, cb) {
+  const c = idx>=0 ? contatos[idx] : {nome:'',papel:'',emoji:'👤',telefone:'',email:'',obs:''};
+  const modal = document.createElement('div'); modal.className = 'modal-bg';
+  const papeis = ['Síndico','Imobiliária','Administradora Airbnb','Inquilino','Proprietário vendedor','Advogado','Cartório','Manutenção','Jardineiro','Portaria','Outro'];
+  modal.innerHTML = `<div class="modal"><div class="modal-title">${idx>=0?'Editar':'Novo'} Contato</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nome</label><input id="cn" class="fi" value="${c.nome}"></div>
+      <div class="fg"><label class="fl">Papel</label><select id="cp" class="fi">${papeis.map(p=>`<option ${c.papel===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Telefone</label><input id="ct" class="fi" value="${c.telefone}" placeholder="(41) 99999-9999"></div>
+      <div class="fg"><label class="fl">E-mail</label><input id="ce" class="fi" type="email" value="${c.email}"></div>
+    </div>
+    <div class="fg"><label class="fl">Emoji</label><input id="cem" class="fi" value="${c.emoji}" style="width:80px"></div>
+    <div class="fg"><label class="fl">Observação</label><input id="co" class="fi" value="${c.obs}" placeholder="Horário, instrução..."></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline" onclick="this.closest('.modal-bg').remove()">Cancelar</button>
+      <button class="btn btn-primary" id="sv-cont">Salvar</button>
+    </div></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#sv-cont').onclick = async () => {
+    const novo = {nome:modal.querySelector('#cn').value.trim(), papel:modal.querySelector('#cp').value, emoji:modal.querySelector('#cem').value||'👤', telefone:modal.querySelector('#ct').value, email:modal.querySelector('#ce').value, obs:modal.querySelector('#co').value};
+    if (!novo.nome) { toast('Nome obrigatório','error'); return; }
+    if (idx>=0) contatos[idx]=novo; else contatos.push(novo);
+    await saveContatos(pid,contatos); modal.remove(); cb(); toast('Contato salvo');
+  };
+}
+
+// ═══════════════════════════════════════
+// RESERVAS AIRBNB / BOOKING
+// ═══════════════════════════════════════
+async function renderPropReservas(main, meta) {
+  main.innerHTML = '';
+  const ym = S.month;
+  const reservas = await getReservas(meta.id, ym);
+  const totalRec = reservas.reduce((s,r)=>s+(Number(r.valor)||0),0);
+  const totalNoites = reservas.reduce((s,r)=>s+(Number(r.noites)||0),0);
+  const ticketMedio = reservas.length ? (totalRec/reservas.length).toFixed(0) : 0;
+
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr">
+    <div class="card-title">🗓️ Reservas — ${fmtM(ym)}</div>
+    <button class="btn btn-primary btn-sm" id="add-res">+ Nova Reserva</button>
+  </div><div class="card-body"></div>`;
+  main.appendChild(card);
+
+  const body = card.querySelector('.card-body');
+
+  // KPIs de reservas
+  const kg = document.createElement('div'); kg.className = 'kpi-grid'; kg.style.marginBottom = '14px';
+  [{label:'Receita do Mês',val:fmt(totalRec),cls:'green'},{label:'Reservas',val:reservas.length,cls:'blue'},{label:'Noites',val:totalNoites,cls:'purple'},{label:'Ticket Médio',val:fmt(Number(ticketMedio)),cls:'yellow'}]
+    .forEach(k=>{const c=document.createElement('div');c.className='kpi '+k.cls;c.innerHTML=`<div class="kpi-lbl">${k.label}</div><div class="kpi-val ${k.cls}">${k.val}</div>`;kg.appendChild(c);});
+  body.appendChild(kg);
+
+  function redraw() {
+    body.querySelectorAll('.res-list').forEach(e=>e.remove());
+    const list = document.createElement('div'); list.className = 'res-list';
+    if (!reservas.length) { list.innerHTML = '<div class="empty"><div class="ei">📅</div><div class="et">Nenhuma reserva registrada</div></div>'; body.appendChild(list); return; }
+    for (let i = 0; i < reservas.length; i++) {
+      const r = reservas[i];
+      const platColor = r.plataforma==='airbnb'?'plat-airbnb':r.plataforma==='booking'?'plat-booking':'plat-direto';
+      const platLabel = r.plataforma==='airbnb'?'Airbnb':r.plataforma==='booking'?'Booking':'Direto';
+      const row = document.createElement('div'); row.className = 'reserva-row';
+      row.innerHTML = `<div class="reserva-plat ${platColor}">${r.plataforma==='airbnb'?'🏠':r.plataforma==='booking'?'🔵':'🤝'}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">${r.hospede||'Hóspede'} <span class="badge b-${r.plataforma==='airbnb'?'airbnb':'entrada'}" style="font-size:10px">${platLabel}</span></div>
+          <div style="font-size:12px;color:var(--text-soft)">${r.checkin||'?'} → ${r.checkout||'?'} · ${r.noites||'?'} noites</div>
+          ${r.obs?`<div style="font-size:11px;color:var(--text-muted);font-style:italic">${r.obs}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="tg" style="font-weight:700;font-size:14px">${fmt(r.valor)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${r.status==='confirmada'?'✓ Confirmada':r.status==='pendente'?'⏳ Pendente':'✕ Cancelada'}</div>
+        </div>
+        <button class="btn btn-ghost btn-xs" onclick="delReserva(${i})">×</button>`;
+      list.appendChild(row);
+    }
+    body.appendChild(list);
+    // Atualiza KPIs
+    const totalR=reservas.reduce((s,r)=>s+(Number(r.valor)||0),0);
+    body.querySelectorAll('.kpi-val')[0].textContent=fmt(totalR);
+    body.querySelectorAll('.kpi-val')[1].textContent=reservas.length;
+    body.querySelectorAll('.kpi-val')[2].textContent=reservas.reduce((s,r)=>s+(Number(r.noites)||0),0);
+    body.querySelectorAll('.kpi-val')[3].textContent=fmt(reservas.length?totalR/reservas.length:0);
+  }
+
+  window.delReserva = async (i) => { if(!confirm('Remover reserva?')) return; reservas.splice(i,1); await saveReservas(meta.id,ym,reservas); redraw(); };
+  card.querySelector('#add-res').onclick = () => openReservaModal(reservas, meta.id, ym, redraw);
+  redraw();
+}
+
+async function openReservaModal(reservas, pid, ym, cb) {
+  const modal = document.createElement('div'); modal.className = 'modal-bg';
+  modal.innerHTML = `<div class="modal"><div class="modal-title">+ Nova Reserva</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Plataforma</label><select id="rp" class="fi">
+        <option value="airbnb">Airbnb</option><option value="booking">Booking.com</option><option value="direto">Reserva Direta</option>
+      </select></div>
+      <div class="fg"><label class="fl">Status</label><select id="rst" class="fi">
+        <option value="confirmada">✓ Confirmada</option><option value="pendente">⏳ Pendente</option><option value="cancelada">✕ Cancelada</option>
+      </select></div>
+    </div>
+    <div class="fg"><label class="fl">Nome do Hóspede</label><input id="rh" class="fi" placeholder="Nome..."></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Check-in</label><input id="rci" class="fi" type="date"></div>
+      <div class="fg"><label class="fl">Check-out</label><input id="rco" class="fi" type="date"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Noites</label><input id="rn" class="fi" type="number" min="1" value="1"></div>
+      <div class="fg"><label class="fl">Valor Recebido (R$)</label><input id="rv" class="fi" type="number" placeholder="0"></div>
+    </div>
+    <div class="fg"><label class="fl">Observações</label><input id="ro" class="fi" placeholder="Taxa limpeza inclusa..."></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline" onclick="this.closest('.modal-bg').remove()">Cancelar</button>
+      <button class="btn btn-primary" id="sv-res">Salvar</button>
+    </div></div>`;
+  document.body.appendChild(modal);
+  // Auto-calcular noites
+  const ci=modal.querySelector('#rci'), co=modal.querySelector('#rco'), nts=modal.querySelector('#rn');
+  const calcN=()=>{if(ci.value&&co.value){const d=Math.ceil((new Date(co.value)-new Date(ci.value))/(86400000));if(d>0)nts.value=d;}};
+  ci.onchange=calcN; co.onchange=calcN;
+  modal.querySelector('#sv-res').onclick = async () => {
+    const novo={plataforma:modal.querySelector('#rp').value, status:modal.querySelector('#rst').value, hospede:modal.querySelector('#rh').value.trim(), checkin:ci.value, checkout:co.value, noites:Number(nts.value)||1, valor:Number(modal.querySelector('#rv').value)||0, obs:modal.querySelector('#ro').value};
+    reservas.push(novo); await saveReservas(pid,ym,reservas); modal.remove(); cb(); toast('Reserva registrada');
+  };
+}
+
+// ═══════════════════════════════════════
+// SEGURO POR IMÓVEL
+// ═══════════════════════════════════════
+async function renderPropSeguro(main, meta) {
+  main.innerHTML = '';
+  const seguro = await getSeguro(meta.id);
+  const hoje = new Date();
+  let statusSeg = 'sem';
+  if (seguro.vigencia_fim) {
+    const fim = new Date(seguro.vigencia_fim);
+    const dias = Math.ceil((fim-hoje)/(86400000));
+    statusSeg = dias < 0 ? 'vencido' : dias <= 30 ? 'vencendo' : 'ok';
+  }
+
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr"><div class="card-title">🛡️ Seguro do Imóvel</div>
+    <span class="reaj-badge ${statusSeg!=='ok'&&statusSeg!=='sem'?statusSeg:''}">${statusSeg==='ok'?'✓ Vigente':statusSeg==='vencendo'?'⚠ Vencendo':statusSeg==='vencido'?'✕ Vencido':'Sem seguro'}</span>
+  </div><div class="card-body"></div>`;
+  const body = card.querySelector('.card-body');
+
+  if (statusSeg === 'sem') {
+    const al = document.createElement('div'); al.className = 'alert alert-warn'; al.style.marginBottom='14px';
+    al.innerHTML = `<div class="alert-icon">⚠️</div><div><div class="alert-title">Sem seguro registrado</div>Imóvel patrimonial sem apólice cadastrada. Recomendável: seguro incêndio + responsabilidade civil.</div>`;
+    body.appendChild(al);
+  }
+
+  const fields = [
+    {key:'seguradora', label:'Seguradora', type:'text', placeholder:'Ex: Porto Seguro, Caixa...'},
+    {key:'apolice', label:'Número da Apólice', type:'text', placeholder:'Nº da apólice'},
+    {key:'vigencia_ini', label:'Vigência — início', type:'date'},
+    {key:'vigencia_fim', label:'Vigência — fim', type:'date'},
+    {key:'valor_segurado', label:'Valor Segurado (R$)', type:'number'},
+    {key:'premio_anual', label:'Prêmio Anual (R$)', type:'number'},
+    {key:'cobertura', label:'Coberturas', type:'text', placeholder:'Incêndio, Resp. Civil, Roubo...'},
+    {key:'contato_seg', label:'Contato / Corretor', type:'text'},
+  ];
+
+  const form = document.createElement('div'); form.className = 'fr';
+  for (const f of fields) {
+    const fg = document.createElement('div'); fg.className = 'fg';
+    fg.innerHTML = `<label class="fl">${f.label}</label>`;
+    const inp = document.createElement('input'); inp.type = f.type; inp.className = 'fi';
+    inp.value = seguro[f.key] || ''; if(f.placeholder) inp.placeholder = f.placeholder;
+    inp.onchange = async () => { seguro[f.key] = f.type==='number'?(parseFloat(inp.value)||0):inp.value; await saveSeguro(meta.id,seguro); toast('Salvo'); renderPropSeguro(main,meta); };
+    fg.appendChild(inp); form.appendChild(fg);
+  }
+  body.appendChild(form);
+
+  if (seguro.valor_segurado) {
+    const info = document.createElement('div'); info.className = 'seguro-card';
+    const taxa = seguro.premio_anual && seguro.valor_segurado ? (seguro.premio_anual/seguro.valor_segurado*100).toFixed(2) : '—';
+    info.innerHTML = `<div style="font-size:12px;font-weight:700;margin-bottom:8px;color:#1e40af">Resumo da Apólice</div>
+      <div class="rel-row"><span>Valor segurado</span><strong>${fmt(seguro.valor_segurado)}</strong></div>
+      <div class="rel-row"><span>Prêmio anual</span><strong>${fmt(seguro.premio_anual||0)}</strong></div>
+      <div class="rel-row"><span>Taxa efetiva</span><strong>${taxa}%</strong></div>`;
+    body.appendChild(info);
+  }
+  main.appendChild(card);
+}
+
+// ═══════════════════════════════════════
+// REAJUSTE DE CONTRATO
+// ═══════════════════════════════════════
+async function renderPropReajuste(main, meta) {
+  main.innerHTML = '';
+  const reaj = await getReajuste(meta.id);
+  const hoje = new Date();
+  let proximoReaj = null, diasReaj = null, statusReaj = 'ok';
+  if (reaj.data_inicio) {
+    const ini = new Date(reaj.data_inicio);
+    const mesesContrato = Math.floor((hoje-ini)/(1000*60*60*24*30.4));
+    const proximoMes = new Date(ini); proximoMes.setMonth(proximoMes.getMonth()+Math.ceil(mesesContrato/12)*12);
+    proximoReaj = proximoMes.toISOString().slice(0,10);
+    diasReaj = Math.ceil((proximoMes-hoje)/(86400000));
+    statusReaj = diasReaj < 0 ? 'vencido' : diasReaj <= 60 ? 'vencendo' : 'ok';
+  }
+
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr"><div class="card-title">📈 Reajuste de Contrato</div>
+    ${proximoReaj?`<span class="reaj-badge ${statusReaj!=='ok'?statusReaj:''}">${statusReaj==='ok'?`Próx: ${proximoReaj}`:statusReaj==='vencendo'?`⚠ ${diasReaj}d p/ reajuste`:'✕ Reajuste em atraso'}</span>`:''}
+  </div><div class="card-body"></div>`;
+  const body = card.querySelector('.card-body');
+
+  const fields = [
+    {key:'inquilino', label:'Inquilino', type:'text'},
+    {key:'data_inicio', label:'Início do contrato', type:'date'},
+    {key:'duracao_meses', label:'Duração (meses)', type:'number', placeholder:'30'},
+    {key:'valor_atual', label:'Aluguel atual (R$)', type:'number'},
+    {key:'indice', label:'Índice de reajuste', type:'text', placeholder:'IGPM, IPCA, IPC-A...'},
+    {key:'percentual_negociado', label:'% negociado (último reajuste)', type:'number'},
+    {key:'data_proximo', label:'Data do próximo reajuste', type:'date'},
+    {key:'valor_projetado', label:'Valor projetado reajustado (R$)', type:'number'},
+    {key:'obs', label:'Observações', type:'text'},
+  ];
+
+  const form = document.createElement('div'); form.className = 'fr';
+  for (const f of fields) {
+    const fg = document.createElement('div'); fg.className = 'fg';
+    fg.innerHTML = `<label class="fl">${f.label}</label>`;
+    const inp = document.createElement('input'); inp.type = f.type; inp.className = 'fi';
+    inp.value = reaj[f.key]||''; if(f.placeholder) inp.placeholder=f.placeholder;
+    inp.onchange = async () => { reaj[f.key]=f.type==='number'?(parseFloat(inp.value)||0):inp.value; await saveReajuste(meta.id,reaj); toast('Salvo'); renderPropReajuste(main,meta); };
+    fg.appendChild(inp); form.appendChild(fg);
+  }
+  body.appendChild(form);
+
+  if (reaj.valor_atual && reaj.valor_projetado) {
+    const delta = reaj.valor_projetado - reaj.valor_atual;
+    const pct = (delta/reaj.valor_atual*100).toFixed(1);
+    const info = document.createElement('div'); info.style.cssText='margin-top:14px;padding:12px 16px;background:#f0fdf4;border-radius:8px';
+    info.innerHTML = `<div style="font-size:13px;font-weight:700;color:#065f46">Impacto do reajuste</div>
+      <div class="rel-row"><span>Valor atual</span><strong>${fmt(reaj.valor_atual)}</strong></div>
+      <div class="rel-row"><span>Valor projetado</span><strong class="tg">${fmt(reaj.valor_projetado)}</strong></div>
+      <div class="rel-row"><span>Aumento</span><strong class="tg">+${fmt(delta)} (+${pct}%/mês)</strong></div>
+      <div class="rel-row"><span>Anual adicional</span><strong class="tg">+${fmt(delta*12)}/ano</strong></div>`;
+    body.appendChild(info);
+  }
+  main.appendChild(card);
+}
+
+// ═══════════════════════════════════════
+// FUNIL DE VENDA
+// ═══════════════════════════════════════
+async function renderPropFunil(main, meta) {
+  main.innerHTML = '';
+  const funil = await getFunil(meta.id);
+  const STAGES = [
+    {id:'disponivel', label:'📢 Disponível para venda', cor:'#94a3b8'},
+    {id:'anunciado', label:'📣 Anunciado (imobiliária)', cor:'#3b82f6'},
+    {id:'visitas', label:'👥 Recebendo visitas', cor:'#f59e0b'},
+    {id:'proposta', label:'🤝 Proposta recebida', cor:'#8b5cf6'},
+    {id:'negociando', label:'💬 Em negociação', cor:'#f97316'},
+    {id:'escritura', label:'📝 Assinando contrato/escritura', cor:'#10b981'},
+    {id:'vendido', label:'✅ Vendido', cor:'#059669'},
+  ];
+
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-hdr"><div class="card-title">🏷️ Funil de Venda</div></div><div class="card-body"></div>`;
+  const body = card.querySelector('.card-body');
+
+  // Estágio atual
+  const stageDiv = document.createElement('div'); stageDiv.style.marginBottom = '16px';
+  stageDiv.innerHTML = '<div class="fl" style="margin-bottom:8px">Estágio atual</div>';
+  for (const st of STAGES) {
+    const s = document.createElement('div'); s.className = 'funil-stage' + (funil.status===st.id?' active-stage':'');
+    s.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${st.cor};display:inline-block;flex-shrink:0"></span> ${st.label}`;
+    s.onclick = async () => { funil.status=st.id; await saveFunil(meta.id,funil); renderPropFunil(main,meta); toast('Estágio atualizado'); };
+    stageDiv.appendChild(s);
+  }
+  body.appendChild(stageDiv);
+
+  // Preço pedido
+  const pForm = document.createElement('div'); pForm.className = 'fr';
+  [{key:'preco',label:'Preço pedido (R$)',type:'number'},{key:'preco_min',label:'Mínimo aceitável (R$)',type:'number'},{key:'contrato_imob',label:'Imobiliária',type:'text'},{key:'comissao_pct',label:'Comissão (%)',type:'number'}]
+    .forEach(f=>{
+      const fg=document.createElement('div'); fg.className='fg';
+      fg.innerHTML=`<label class="fl">${f.label}</label>`;
+      const inp=document.createElement('input'); inp.type=f.type; inp.className='fi'; inp.value=funil[f.key]||'';
+      inp.onchange=async ()=>{funil[f.key]=f.type==='number'?(parseFloat(inp.value)||0):inp.value;await saveFunil(meta.id,funil);toast('Salvo');};
+      fg.appendChild(inp); pForm.appendChild(fg);
+    });
+  body.appendChild(pForm);
+
+  // Propostas
+  const propCard = document.createElement('div'); propCard.className = 'card'; propCard.style.marginTop = '12px';
+  propCard.innerHTML = `<div class="card-hdr"><div class="card-title">Propostas Recebidas</div><button class="btn btn-primary btn-sm" id="add-prop">+ Proposta</button></div><div class="card-body" id="prop-body"></div>`;
+  function redrawProp() {
+    const pb = propCard.querySelector('#prop-body'); pb.innerHTML='';
+    if (!funil.propostas?.length) { pb.innerHTML='<div class="empty"><div class="et">Nenhuma proposta ainda</div></div>'; return; }
+    for (let i=0;i<funil.propostas.length;i++) {
+      const p=funil.propostas[i];
+      const delta=funil.preco?((p.valor-funil.preco)/funil.preco*100).toFixed(1):null;
+      const row=document.createElement('div'); row.className='rel-row';
+      row.innerHTML=`<div><strong>${p.comprador||'Comprador'}</strong><div style="font-size:11px;color:var(--text-muted)">${p.data||''} · ${p.obs||''}</div></div>
+        <div style="text-align:right"><div class="tg" style="font-size:14px;font-weight:700">${fmt(p.valor)}</div>${delta?`<div style="font-size:11px;color:${Number(delta)>=0?'var(--green)':'var(--red)'}">${Number(delta)>=0?'+':''}${delta}%</div>`:''}</div>
+        <button class="btn btn-ghost btn-xs" onclick="delProposta(${i})">×</button>`;
+      pb.appendChild(row);
+    }
+  }
+  window.delProposta=async (i)=>{funil.propostas.splice(i,1);await saveFunil(meta.id,funil);redrawProp();};
+  propCard.querySelector('#add-prop').onclick=async ()=>{
+    const m=document.createElement('div'); m.className='modal-bg';
+    m.innerHTML=`<div class="modal"><div class="modal-title">+ Nova Proposta</div>
+      <div class="fg"><label class="fl">Comprador / Corretor</label><input id="pc" class="fi"></div>
+      <div class="fr"><div class="fg"><label class="fl">Valor (R$)</label><input id="pv" class="fi" type="number"></div><div class="fg"><label class="fl">Data</label><input id="pd" class="fi" type="date"></div></div>
+      <div class="fg"><label class="fl">Observações</label><input id="po" class="fi" placeholder="Condições, financiamento..."></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-outline" onclick="this.closest('.modal-bg').remove()">Cancelar</button><button class="btn btn-primary" id="sv-p">Salvar</button></div></div>`;
+    document.body.appendChild(m);
+    m.querySelector('#sv-p').onclick=async ()=>{
+      if(!funil.propostas) funil.propostas=[];
+      funil.propostas.push({comprador:m.querySelector('#pc').value,valor:Number(m.querySelector('#pv').value)||0,data:m.querySelector('#pd').value,obs:m.querySelector('#po').value});
+      await saveFunil(meta.id,funil);m.remove();redrawProp();toast('Proposta registrada');
+    };
+  };
+  redrawProp();
+  body.appendChild(propCard);
+
+  // Observação geral
+  const obsFg = document.createElement('div'); obsFg.className = 'fg'; obsFg.style.marginTop='12px';
+  obsFg.innerHTML = '<label class="fl">Observações gerais do processo</label>';
+  const ta = document.createElement('textarea'); ta.className='fi'; ta.rows=3; ta.value=funil.obs||'';
+  ta.onchange=async ()=>{funil.obs=ta.value;await saveFunil(meta.id,funil);toast('Salvo');};
+  obsFg.appendChild(ta); body.appendChild(obsFg);
+  main.appendChild(card);
+}
+
+// ═══════════════════════════════════════
+// RELATÓRIO MENSAL
+// ═══════════════════════════════════════
+async function renderRelatorio(main) {
+  main.innerHTML='';
+  const ym=S.month;
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML=`<div><div class="pg-title">📋 Relatório Mensal</div><div class="pg-sub">Prestação de contas — ${fmtM(ym)}</div></div>`;
+  const btnPrint=document.createElement('button'); btnPrint.className='btn btn-primary';
+  btnPrint.innerHTML='🖨️ Imprimir / PDF';
+  btnPrint.onclick=()=>window.print();
+  ph.appendChild(btnPrint); main.appendChild(ph);
+
+  const tots = await computeAllTotals(ym);
+
+  // Resumo executivo
+  const resCard=document.createElement('div'); resCard.className='card';
+  resCard.innerHTML=`<div class="card-hdr"><div class="card-title">📊 Resumo Executivo — ${fmtM(ym)}</div></div><div class="card-body">
+    <div class="rel-section">
+      <div class="rel-section-title">Resultado Consolidado</div>
+      <div class="rel-row"><span>Total de entradas</span><strong class="tg">${fmt(tots.totalEntradas)}</strong></div>
+      <div class="rel-row"><span>Total de saídas</span><strong class="tr">${fmt(tots.totalSaidas)}</strong></div>
+      <div class="rel-row rel-total"><span>Resultado líquido do mês</span><strong class="${tots.net>=0?'tg':'tr'}">${fmt(tots.net)}</strong></div>
+    </div>
+  </div>`;
+  main.appendChild(resCard);
+
+  // Por imóvel
+  for (const m of PROPS) {
+    const t=await computeTotals(m.id,ym);
+    const pipe=await getPipeline(m.id,ym);
+    if (t.entradas===0 && t.saidas===0) continue;
+    const propCard=document.createElement('div'); propCard.className='card';
+    let html=`<div class="card-hdr"><div class="card-title">${m.icon} ${m.name} <span class="badge b-${m.mode}" style="margin-left:6px">${MODE_LABEL[m.mode]}</span></div></div><div class="card-body"><div class="rel-section">`;
+
+    // Entradas
+    if (m.entradas?.length) {
+      html+=`<div class="rel-section-title">Entradas</div>`;
+      for(const e of m.entradas) {
+        const ed=pipe.entradas[e.id]||{valor:0,status:'aguardando'};
+        const stIcon=ed.status==='recebido'?'✓':ed.status==='verificado'?'⏳':'❌';
+        html+=`<div class="rel-row"><span>${e.label}</span><span class="tg">${fmt(ed.valor)} <small>${stIcon}</small></span></div>`;
+      }
+    }
+    // Saídas
+    const saidas=m.custos?.filter(c=>c.tipo!=='info')||[];
+    if (saidas.length) {
+      html+=`<div class="rel-section-title" style="margin-top:10px">Saídas</div>`;
+      for(const c of saidas) {
+        const cd=pipe.custos[c.id]||{valor:0,status:'aberto'};
+        if(!cd.valor) continue;
+        const resp=await getResponsavel(m.id,c.id);
+        const stIcon=cd.status==='pago'?'✓':cd.status==='boleto_ok'?'⏳':'❌';
+        const respLabel=resp.resp==='assistente'?'👩':resp.resp==='imobiliaria'?'🏢':'🤖';
+        html+=`<div class="rel-row"><span>${c.label} ${respLabel}</span><span class="tr">${fmt(cd.valor)} <small>${stIcon}</small></span></div>`;
+      }
+    }
+    html+=`<div class="rel-row rel-total"><span>Resultado ${m.name}</span><strong class="${t.net>=0?'tg':'tr'}">${fmt(t.net)}</strong></div></div></div>`;
+    propCard.innerHTML=html;
+    main.appendChild(propCard);
+  }
+
+  // Itens pendentes
+  const pendCard=document.createElement('div'); pendCard.className='card';
+  let pendHtml=`<div class="card-hdr"><div class="card-title">⚠️ Pendências do Mês</div></div><div class="card-body">`;
+  let hasPend=false;
+  for(const m of PROPS){
+    const pipe=await getPipeline(m.id,ym);
+    const pendSaidas=m.custos?.filter(c=>c.tipo!=='info'&&(pipe.custos[c.id]?.status||'aberto')!=='pago'&&(pipe.custos[c.id]?.valor||0)>0)||[];
+    const pendEntradas=m.entradas?.filter(e=>((pipe.entradas[e.id]?.status||'aguardando')!=='recebido')&&(pipe.entradas[e.id]?.valor||0)>0)||[];
+    if(pendSaidas.length||pendEntradas.length) {
+      hasPend=true;
+      pendSaidas.forEach(c=>{ pendHtml+=`<div class="rel-row"><span>💳 ${m.name} — ${c.label}</span><span class="tr">${fmt(pipe.custos[c.id]?.valor||0)} (${pipe.custos[c.id]?.status==='boleto_ok'?'Boleto OK':'Em aberto'})</span></div>`; });
+      pendEntradas.forEach(e=>{ pendHtml+=`<div class="rel-row"><span>💰 ${m.name} — ${e.label}</span><span class="tm">Aguardando confirmação</span></div>`; });
+    }
+  }
+  if(!hasPend) pendHtml+=`<div class="alert alert-success"><div class="alert-icon">✅</div><div>Todos os itens do mês foram resolvidos!</div></div>`;
+  pendHtml+='</div>';
+  pendCard.innerHTML=pendHtml;
+  main.appendChild(pendCard);
+}
+
+// ═══════════════════════════════════════
+// RANKING DE IMÓVEIS
+// ═══════════════════════════════════════
+async function renderRanking(main) {
+  main.innerHTML='';
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML=`<div><div class="pg-title">🏆 Ranking de Imóveis</div><div class="pg-sub">Comparativo de performance do portfólio</div></div>`;
+  ph.appendChild(await mkMN()); main.appendChild(ph);
+  const ym=S.month;
+
+  // Calcular métricas por imóvel
+  const dados=await Promise.all(PROPS.map(async m=>{
+    const t=await computeTotals(m.id,ym);
+    const yld=await computeYield(m.id);
+    const docs=await getPropDocs(m.id);
+    const docPct=docs.length?Math.round(docs.filter(d=>d.done).length/docs.length*100):100;
+    const ps=await pipelineStatus(m.id,ym);
+    return {m,t,yld,docPct,ps};
+  }));
+
+  // Ranking por resultado
+  const byResult=[...dados].sort((a,b)=>b.t.net-a.t.net);
+  const byYield=[...dados].filter(d=>d.yld).sort((a,b)=>Number(b.yld)-Number(a.yld));
+  const byCusto=[...dados].sort((a,b)=>b.t.saidas-a.t.saidas);
+
+  const mkRank=(title,list,keyFn)=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`<div class="card-hdr"><div class="card-title">${title}</div></div><div class="card-body"></div>`;
+    const body=card.querySelector('.card-body');
+    list.slice(0,8).forEach((d,i)=>{
+      const row=document.createElement('div'); row.className='rank-row';
+      const numCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+      row.innerHTML=`<div class="rank-num ${numCls}">${i+1}</div>
+        <div style="font-size:16px;width:24px;text-align:center">${d.m.icon}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${d.m.name}</div><div style="font-size:11px;color:var(--text-soft)">${d.m.city}, ${d.m.state}</div></div>
+        <div style="text-align:right"><strong>${keyFn(d)}</strong></div>`;
+      row.onclick=()=>navigate(d.m.id); row.style.cursor='pointer';
+      row.onmouseenter=()=>row.style.background='#f8fafc'; row.onmouseleave=()=>row.style.background='';
+      body.appendChild(row);
+    });
+    return card;
+  };
+
+  const grid=document.createElement('div'); grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px';
+  grid.appendChild(mkRank('💰 Maior Resultado (mês)',byResult,d=>`<span class="${d.t.net>=0?'tg':'tr'}">${fmt(d.t.net)}</span>`));
+  if(byYield.length) grid.appendChild(mkRank('📈 Maior Yield (anual)',byYield,d=>`<span class="tg">${d.yld}% a.a.</span>`));
+  grid.appendChild(mkRank('💸 Maior Custo (mês)',byCusto,d=>`<span class="tr">${fmt(d.t.saidas)}</span>`));
+  main.appendChild(grid);
+
+  // Tabela completa
+  const tc=document.createElement('div'); tc.className='card'; tc.style.marginTop='16px';
+  tc.innerHTML=`<div class="card-hdr"><div class="card-title">Comparativo Completo</div></div><div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>Imóvel</th><th>Tipo</th><th class="num">Entradas</th><th class="num">Saídas</th><th class="num">Resultado</th><th class="num">Yield a.a.</th><th class="num">Docs %</th><th>Pipeline</th></tr></thead>
+    <tbody id="rank-tb"></tbody></table></div>`;
+  main.appendChild(tc);
+  const tb=tc.querySelector('#rank-tb');
+  dados.sort((a,b)=>b.t.net-a.t.net).forEach(d=>{
+    const tr=document.createElement('tr'); tr.className='clickable';
+    tr.innerHTML=`<td>${d.m.icon} ${d.m.name}</td>
+      <td><span class="badge b-${d.m.mode}">${MODE_LABEL[d.m.mode]}</span></td>
+      <td class="num ${d.t.entradas>0?'tg':'tm'}">${fmt(d.t.entradas)}</td>
+      <td class="num ${d.t.saidas>0?'tr':'tm'}">${fmt(d.t.saidas)}</td>
+      <td class="num ${d.t.net>=0?'tg':'tr'}">${fmt(d.t.net)}</td>
+      <td class="num">${d.yld?`<span class="tg">${d.yld}%</span>`:'<span class="tm">—</span>'}</td>
+      <td class="num"><span class="${d.docPct===100?'tg':d.docPct>50?'':'tr'}">${d.docPct}%</span></td>
+      <td>${d.ps.pendente===0?'<span class="badge b-ok">✓</span>':`<span class="badge b-pend">${d.ps.pendente}</span>`}</td>`;
+    tr.onclick=()=>navigate(d.m.id); tb.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════
+// ALERTAS
+// ═══════════════════════════════════════
+async function renderAlertas(main) {
+  main.innerHTML='';
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML='<div><div class="pg-title">🔔 Central de Alertas</div><div class="pg-sub">Vencimentos e documentos próximos do prazo</div></div>';
+  main.appendChild(ph);
+
+  const venc=await getVencimentos(30);
+  const urgentes=venc.filter(v=>v.urgente);
+  const avisos=venc.filter(v=>!v.urgente);
+
+  if(!venc.length) {
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML='<div class="card-body"><div class="empty"><div class="ei">✅</div><div class="et">Nenhum alerta nos próximos 30 dias</div></div></div>';
+    main.appendChild(card); return;
+  }
+
+  const kg=document.createElement('div'); kg.className='kpi-grid'; kg.style.marginBottom='16px';
+  [{label:'Urgentes',val:urgentes.length,cls:urgentes.length>0?'red':'green',sub:'Vence em ≤7 dias'},{label:'Avisos',val:avisos.length,cls:'yellow',sub:'Vence em ≤30 dias'}]
+    .forEach(k=>{const c=document.createElement('div');c.className='kpi '+k.cls;c.innerHTML=`<div class="kpi-lbl">${k.label}</div><div class="kpi-val ${k.cls}">${k.val}</div><div class="kpi-sub">${k.sub}</div>`;kg.appendChild(c);});
+  main.appendChild(kg);
+
+  const mkSection=async (title,items)=>{
+    if(!items.length) return;
+    const card=document.createElement('div'); card.className='card'; card.style.marginBottom='14px';
+    card.innerHTML=`<div class="card-hdr"><div class="card-title">${title}</div></div><div class="card-body"></div>`;
+    const body=card.querySelector('.card-body');
+    for(const v of items) {
+      const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f8fafc;cursor:pointer';
+      const urgClass=v.urgente?'urgente':'aviso';
+      if(v.isDoc) {
+        row.innerHTML=`<div class="alert-venc-item ${urgClass}" style="flex:1;margin:0">📄 <strong>${v.prop.name}</strong> — ${v.doc.label} <span style="margin-left:auto">vence em <strong>${v.dias}d</strong></span></div>`;
+      } else {
+        row.innerHTML=`<div class="alert-venc-item ${urgClass}" style="flex:1;margin:0">💳 <strong>${v.prop.name}</strong> — ${v.custo.label} <span style="margin-left:auto">dia ${v.custo.vencDia} (<strong>${v.dias}d</strong>)</span></div>`;
+      }
+      row.onclick=async ()=>{navigate(v.prop.id);setTimeout(async ()=>{S.tab=v.isDoc?'documentos':'pipeline';await renderMain();},100);};
+      body.appendChild(row);
+    }
+    main.appendChild(card);
+  };
+
+  mkSection('🔴 Urgentes — vence em até 7 dias',urgentes);
+  mkSection('🟡 Avisos — vence em 8-30 dias',avisos);
+}
+
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+async function renderConfig(main) {
+  main.innerHTML='';
+  const ph=document.createElement('div'); ph.className='pg-hdr';
+  ph.innerHTML='<div><div class="pg-title">⚙️ Configurações</div></div>';
+  main.appendChild(ph);
+
+  const uc=document.createElement('div'); uc.className='card';
+  uc.innerHTML='<div class="card-hdr"><div class="card-title">Utilitários</div></div><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap"></div>';
+  const ub=uc.querySelector('.card-body');
+
+  const bExp=document.createElement('button'); bExp.className='btn btn-primary'; bExp.innerHTML='⬇ Exportar backup';
+  bExp.onclick=async ()=>{
+    const d={
+      pipeline:await ls.get(SK.pipeline), docs:await ls.get(SK.docs), agenda:await ls.get(SK.agenda),
+      extrato:await ls.get(SK.extrato), ficha:await ls.get(SK.ficha),
+      contatos:await ls.get(SK.contatos), reservas:await ls.get(SK.reservas), seguros:await ls.get(SK.seguros),
+      reajuste:await ls.get(SK.reajuste), funil:await ls.get(SK.funil), responsavel:await ls.get(SK.responsavel),
+      props:await ls.get(SK.props), at:new Date().toISOString()
+    };
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
+    a.download='brito-empreendimentos-backup-'+S.month+'.json'; a.click(); toast('Backup completo exportado');
+  };
+
+  const bImp=document.createElement('button'); bImp.className='btn btn-outline'; bImp.innerHTML='⬆ Importar backup';
+  const iInp=document.createElement('input'); iInp.type='file'; iInp.accept='.json'; iInp.style.display='none';
+  iInp.onchange=()=>{const f=iInp.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{
+    const d=JSON.parse(e.target.result);
+    const keys=['pipeline','docs','agenda','extrato','ficha','contatos','reservas','seguros','reajuste','funil','responsavel','props'];
+    const skMap={pipeline:SK.pipeline,docs:SK.docs,agenda:SK.agenda,extrato:SK.extrato,ficha:SK.ficha,contatos:SK.contatos,reservas:SK.reservas,seguros:SK.seguros,reajuste:SK.reajuste,funil:SK.funil,responsavel:SK.responsavel,props:SK.props};
+    for(const k of keys){if(d[k]) await ls.set(skMap[k],d[k]);}
+    if(d.props) await loadUserProps();
+    toast('Backup importado com sucesso'); renderSidebar(); renderMain();
+  }catch{toast('Erro ao importar','error');}};r.readAsText(f);};
+  bImp.onclick=()=>iInp.click();
+
+  const bReset=document.createElement('button'); bReset.className='btn btn-danger'; bReset.innerHTML='⚠ Resetar';
+  bReset.onclick=async ()=>{if(confirm('Apagar TODOS os dados?')){for(const t of Object.values(SK)) await dbSet(t,'main',null);toast('Resetado','info');await renderMain();}};
+
+
+  const bMigrate=document.createElement('button'); bMigrate.className='btn btn-success'; bMigrate.innerHTML='☁ Migrar localStorage → Supabase';
+  bMigrate.onclick=async ()=>{
+    if(!confirm('Migrar dados do localStorage para o Supabase? Os dados locais serão copiados para a nuvem.')) return;
+    const skMap={pipeline:SK.pipeline,docs:SK.docs,agenda:SK.agenda,extrato:SK.extrato,ficha:SK.ficha,contatos:SK.contatos,reservas:SK.reservas,seguros:SK.seguros,reajuste:SK.reajuste,funil:SK.funil,responsavel:SK.responsavel,props:SK.props};
+    const lsKeys={pipeline:'be3_pipe',docs:'be3_docs',agenda:'be3_agenda',extrato:'be3_ext',ficha:'be3_ficha',contatos:'be3_contatos',reservas:'be3_reservas',seguros:'be3_seguros',reajuste:'be3_reajuste',funil:'be3_funil',responsavel:'be3_resp',props:'be3_props'};
+    let count=0;
+    for(const[name,lsKey]of Object.entries(lsKeys)){
+      try{const v=JSON.parse(localStorage.getItem(lsKey));if(v){await dbSet(skMap[name],'main',v);count++;}}catch(e){}
+    }
+    if(count>0){await loadUserProps();await renderSidebar();await renderMain();}
+    toast(count>0?`${count} chaves migradas!`:'Nenhum dado local encontrado','info');
+  };
+  ub.append(bExp,bImp,iInp,bReset,bMigrate);
+  main.appendChild(uc);
+
+  const sc=document.createElement('div'); sc.className='card';
+  sc.innerHTML=`<div class="card-hdr"><div class="card-title">Armazenamento</div></div><div class="card-body"><div style="font-size:13px;color:var(--text-soft)">Dados sincronizados no Supabase ☁️</div></div>`;
+  main.appendChild(sc);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+async function init() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text-muted);font-size:15px;gap:10px"><span style="animation:spin 1s linear infinite;display:inline-block">⏳</span> Carregando dados...</div>';
+  S.month = ymNow();
+  try {
+    await loadUserProps();
+    await renderSidebar();
+    await renderMain();
+  } catch(e) {
+    main.innerHTML = '<div style="padding:20px;color:red;font-size:13px;white-space:pre-wrap">Erro ao carregar: ' + e.message + '\n' + (e.stack||'') + '</div>';
+    console.error('init error:', e);
+  }
+}
+init();
+</script>
+</body>
+</html>
