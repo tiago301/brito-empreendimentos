@@ -820,6 +820,7 @@ const SK = {
   funil:'be_funil',
   responsavel:'be_responsavel',
   props:'be_props',
+  pagamentos:'be_pagamentos',
 };
 
 // ls agora é wrapper async (todas as funções que usam ls são async)
@@ -1015,6 +1016,9 @@ async function getResponsavel(pid,cid) {
 }
 async function saveResponsavel(pid,cid,v) { const all=await ls.get(SK.responsavel)||{}; if(!all[pid]) all[pid]={}; all[pid][cid]=v; await ls.set(SK.responsavel,all); }
 
+async function getPagamentos() { return await ls.get(SK.pagamentos) || []; }
+async function savePagamentos(v) { await ls.set(SK.pagamentos, v); }
+
 // Yield anual por imóvel: receita anual / valor mercado
 async function computeYield(pid) {
   const allPipe=await ls.get(SK.pipeline)||{};
@@ -1120,6 +1124,8 @@ async function renderSidebar() {
     el.onclick=()=>navigate(view); return el;
   };
   const venc=await getVencimentos(5);
+  const pags=await getPagamentos();
+  const pagsPendentes=pags.filter(p=>p.status==='pendente').length;
   const sec=document.createElement('div');
   sec.appendChild(mk('Dashboard','dashboard','📊'));
   sec.appendChild(mk('Pipeline Geral','pipeline','🔄'));
@@ -1128,6 +1134,11 @@ async function renderSidebar() {
   sec.appendChild(mk('Extrato','extrato','💳'));
   sec.appendChild(mk('Relatório','relatorio','📋'));
   sec.appendChild(mk('Ranking','ranking','🏆'));
+  {
+    const el=document.createElement('div'); el.className='sb-item'+(S.view==='pagamentos'?' active':'');
+    el.innerHTML=`<span style="font-size:14px;width:16px;text-align:center">💳</span><span class="sb-name">Pagamentos</span>${pagsPendentes?`<span class="sb-pill" style="background:#f59e0b;color:#fff">${pagsPendentes}</span>`:''}`;
+    el.onclick=()=>navigate('pagamentos'); sec.appendChild(el);
+  }
   {
     const el=document.createElement('div'); el.className='sb-item'+(S.view==='alertas'?' active':'');
     el.innerHTML=`<span style="font-size:14px;width:16px;text-align:center">🔔</span><span class="sb-name">Alertas</span>${venc.length?`<span class="sb-pill" style="background:#ef4444;color:#fff">${venc.length}</span>`:''}`;
@@ -1209,6 +1220,7 @@ async function renderMain() {
   else if (S.view==='relatorio') await renderRelatorio(main);
   else if (S.view==='ranking') await renderRanking(main);
   else if (S.view==='alertas') await renderAlertas(main);
+  else if (S.view==='pagamentos') await renderPagamentos(main);
   else if (S.view==='config') await renderConfig(main);
   else { const m=PROPS.find(p=>p.id===S.view); if(m) await renderProperty(main,m); }
 }
@@ -1609,13 +1621,13 @@ async function renderPropPipeline(main, meta) {
       const ed=pipe.entradas[e.id]||(pipe.entradas[e.id]={valor:e.valor||0,status:'aguardando',data:'',comprovante:null,obs:''});
       body.appendChild(await mkPipeRow({
         label: e.label, subLabel: e.recorrente?'Recorrente':'Variável',
-        valor: ed.valor, status: ed.status,
+        valor: ed.valor, status: ed.status, obs: ed.obs||'',
         statusOpts: [{v:'aguardando',l:'Aguardando'},{v:'verificado',l:'Verificado'},{v:'recebido',l:'✓ Recebido'}],
         comprovante: ed.comprovante,
         onValor: async v => { ed.valor=v; await savePipeline(meta.id,ym,pipe); updateRB(); },
         onStatus: async s => { ed.status=s; await savePipeline(meta.id,ym,pipe); renderSidebar(); toast(s==='recebido'?'Marcado como recebido':s==='verificado'?'Verificado':'Aguardando'); },
         onComp: async f => { ed.comprovante=f; await savePipeline(meta.id,ym,pipe); toast('Comprovante salvo'); },
-        onObs: async t => { ed.obs=t; await savePipeline(meta.id,ym,pipe); },
+        onObs: async t => { ed.obs=t; await savePipeline(meta.id,ym,pipe); toast('Nota salva'); },
         isEntrada: true
       }));
     }
@@ -1634,13 +1646,13 @@ async function renderPropPipeline(main, meta) {
       const cd=pipe.custos[c.id]||(pipe.custos[c.id]={valor:c.valor||0,status:'aberto',venc:'',comprovante:null,obs:''});
       body.appendChild(await mkPipeRow({
         label: c.label, subLabel: c.recorrente?`Recorrente · vence dia ${c.vencDia||'?'}`:'Eventual',
-        valor: cd.valor, status: cd.status,
+        valor: cd.valor, status: cd.status, obs: cd.obs||'',
         statusOpts: [{v:'aberto',l:'Em aberto'},{v:'boleto_ok',l:'Boleto OK'},{v:'pago',l:'✓ Pago'}],
         comprovante: cd.comprovante,
         onValor: async v => { cd.valor=v; await savePipeline(meta.id,ym,pipe); updateRB(); },
         onStatus: async s => { cd.status=s; await savePipeline(meta.id,ym,pipe); renderSidebar(); toast(s==='pago'?'Marcado como pago':s==='boleto_ok'?'Boleto OK registrado':'Em aberto'); },
         onComp: async f => { cd.comprovante=f; await savePipeline(meta.id,ym,pipe); toast('Comprovante salvo'); },
-        onObs: async t => { cd.obs=t; await savePipeline(meta.id,ym,pipe); },
+        onObs: async t => { cd.obs=t; await savePipeline(meta.id,ym,pipe); toast('Nota salva'); },
         isEntrada: false, pid: meta.id, cid: c.id
       }));
     }
@@ -1665,8 +1677,8 @@ async function renderPropPipeline(main, meta) {
   window.updateRB = fillRB;
 }
 
-async function mkPipeRow({label, subLabel, valor, status, statusOpts, comprovante, onValor, onStatus, onComp, onObs, isEntrada, pid, cid}) {
-  const row=document.createElement('div'); row.className='pipe-row';
+async function mkPipeRow({label, subLabel, valor, status, statusOpts, comprovante, obs, onValor, onStatus, onComp, onObs, isEntrada, pid, cid}) {
+  const row=document.createElement('div'); row.className='pipe-row'; row.style.flexWrap='wrap';
 
   const info=document.createElement('div'); info.style.flex='1';
   info.innerHTML=`<div class="pipe-cat">${label}</div><div class="pipe-cat-sub">${subLabel}</div>`;
@@ -1697,20 +1709,57 @@ async function mkPipeRow({label, subLabel, valor, status, statusOpts, comprovant
 
   const fi=document.createElement('input'); fi.type='file'; fi.accept='image/*,.pdf'; fi.style.display='none';
   const chip=document.createElement('div'); chip.className='up-chip'+(comprovante?' has-file':'');
-  chip.innerHTML=comprovante?'📎 Ver':'📎 Comprovante';
+  chip.innerHTML=comprovante?'📎 Comprov.':'📎 Comprov.';
+  chip.title = comprovante ? 'Substituir comprovante' : 'Anexar comprovante';
   chip.onclick=()=>fi.click();
   fi.onchange=()=>{
     const f=fi.files[0]; if(!f) return;
     if(f.size>5*1024*1024){toast('Arquivo > 5MB','error');return;}
     const reader=new FileReader();
-    reader.onload=e=>{onComp(e.target.result); chip.className='up-chip has-file'; chip.innerHTML='📎 Salvo ✓';};
+    reader.onload=e=>{onComp(e.target.result); chip.className='up-chip has-file'; chip.innerHTML='📎 Comprov.';};
     reader.readAsDataURL(f);
   };
+
+  // Ver comprovante se existir
+  if (comprovante) {
+    const viewChip = document.createElement('div'); viewChip.className='up-chip has-file'; viewChip.innerHTML='👁 Ver'; viewChip.style.marginLeft='2px';
+    viewChip.onclick=()=>{
+      const overlay=document.createElement('div'); overlay.className='modal-bg'; overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+      const box=document.createElement('div'); box.style.cssText='background:#fff;border-radius:12px;padding:16px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)';
+      const hdr=document.createElement('div'); hdr.style.cssText='display:flex;justify-content:space-between;gap:12px';
+      const dlBtn=document.createElement('button'); dlBtn.className='btn btn-outline btn-sm'; dlBtn.textContent='⬇ Baixar'; dlBtn.onclick=()=>{const a=document.createElement('a');a.href=comprovante;a.download='comprovante';a.click();};
+      const closeBtn=document.createElement('button'); closeBtn.className='btn btn-ghost btn-sm'; closeBtn.textContent='✕ Fechar'; closeBtn.onclick=()=>overlay.remove();
+      hdr.innerHTML=`<strong style="font-size:13px">${label}</strong>`; hdr.append(dlBtn,closeBtn);
+      const content=document.createElement('div'); content.style.cssText='overflow:auto;border-radius:8px;border:1px solid var(--border)';
+      if(comprovante.startsWith('data:application/pdf')||comprovante.startsWith('data:application/octet')){
+        const iframe=document.createElement('iframe'); iframe.src=comprovante; iframe.style.cssText='width:75vw;height:75vh;border:none;border-radius:7px'; content.appendChild(iframe);
+      } else {
+        const img=document.createElement('img'); img.src=comprovante; img.style.cssText='max-width:75vw;max-height:75vh;display:block;border-radius:7px'; content.appendChild(img);
+      }
+      box.append(hdr,content); overlay.appendChild(box); document.body.appendChild(overlay);
+    };
+    chip.parentNode; // placeholder — appended below in actions
+    const actions2=document.createElement('div'); actions2.className='pipe-actions';
+    actions2.append(sel, chip, viewChip, fi);
+    // Obs inline
+    const obsWrap=document.createElement('div'); obsWrap.style.cssText='width:100%;padding:4px 0 0 0;display:flex;align-items:center;gap:6px';
+    const obsInp=document.createElement('input'); obsInp.type='text'; obsInp.className='fi'; obsInp.placeholder='Nota rápida: nº boleto, Pix, observação...'; obsInp.style.cssText='font-size:12px;padding:5px 9px';
+    obsInp.value=obs||''; obsInp.onchange=()=>onObs(obsInp.value);
+    obsWrap.appendChild(obsInp);
+    row.append(info, valInp, actions2, obsWrap);
+    return row;
+  }
 
   const actions=document.createElement('div'); actions.className='pipe-actions';
   actions.append(sel, chip, fi);
 
-  row.append(info, valInp, actions);
+  // Obs inline
+  const obsWrap=document.createElement('div'); obsWrap.style.cssText='width:100%;padding:4px 0 0 0;display:flex;align-items:center;gap:6px';
+  const obsInp=document.createElement('input'); obsInp.type='text'; obsInp.className='fi'; obsInp.placeholder='Nota rápida: nº boleto, Pix, observação...'; obsInp.style.cssText='font-size:12px;padding:5px 9px';
+  obsInp.value=obs||''; obsInp.onchange=()=>onObs(obsInp.value);
+  obsWrap.appendChild(obsInp);
+
+  row.append(info, valInp, actions, obsWrap);
   return row;
 }
 
@@ -2790,6 +2839,169 @@ async function renderAlertas(main) {
 }
 
 // ═══════════════════════════════════════
+// PAGAMENTOS
+// ═══════════════════════════════════════
+async function renderPagamentos(main) {
+  main.innerHTML = '';
+  const ph = document.createElement('div'); ph.className = 'pg-hdr';
+  ph.innerHTML = `<div><div class="pg-title">💳 Fila de Pagamentos</div><div class="pg-sub">Ana registra · Tiago aprova</div></div>`;
+  const btnNovo = document.createElement('button'); btnNovo.className = 'btn btn-primary'; btnNovo.innerHTML = '+ Registrar pagamento';
+  btnNovo.onclick = () => openPagamentoModal(null, () => renderPagamentos(main));
+  ph.appendChild(btnNovo);
+  main.appendChild(ph);
+
+  const pags = await getPagamentos();
+  const pendentes = pags.filter(p => p.status === 'pendente');
+  const aprovados = pags.filter(p => p.status === 'aprovado');
+  const rejeitados = pags.filter(p => p.status === 'rejeitado');
+
+  // KPIs
+  const kg = document.createElement('div'); kg.className = 'kpi-grid'; kg.style.marginBottom = '20px';
+  const totalPend = pendentes.reduce((s,p)=>s+(Number(p.valor)||0),0);
+  const totalAprov = aprovados.reduce((s,p)=>s+(Number(p.valor)||0),0);
+  [
+    {label:'Aguardando aprovação', val: pendentes.length, sub: fmt(totalPend), cls: pendentes.length>0?'yellow':'green'},
+    {label:'Aprovados este mês', val: aprovados.filter(p=>p.criadoEm&&p.criadoEm.startsWith(S.month)).length, sub: fmt(totalAprov), cls:'green'},
+    {label:'Total na fila', val: pags.length, sub:'Todos os status', cls:'blue'},
+  ].forEach(k => {
+    const c = document.createElement('div'); c.className = 'kpi ' + k.cls;
+    c.innerHTML = `<div class="kpi-lbl">${k.label}</div><div class="kpi-val ${k.cls}">${k.val}</div><div class="kpi-sub">${k.sub}</div>`;
+    kg.appendChild(c);
+  });
+  main.appendChild(kg);
+
+  const renderSection = (title, items, showActions) => {
+    if (!items.length) return;
+    const card = document.createElement('div'); card.className = 'card'; card.style.marginBottom = '16px';
+    card.innerHTML = `<div class="card-hdr"><div class="card-title">${title}</div></div><div class="card-body" style="padding:0"></div>`;
+    const body = card.querySelector('.card-body');
+    for (const p of items) {
+      const prop = PROPS.find(x => x.id === p.propId);
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f8fafc;flex-wrap:wrap';
+      const statusColor = p.status==='pendente'?'#f59e0b':p.status==='aprovado'?'#10b981':'#ef4444';
+      const statusLabel = p.status==='pendente'?'⏳ Pendente':p.status==='aprovado'?'✓ Aprovado':'✕ Rejeitado';
+      row.innerHTML = `
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:700;font-size:13px">${p.descricao}</div>
+          <div style="font-size:11px;color:var(--text-soft);margin-top:2px">
+            ${prop?`${prop.icon} ${prop.name}`:p.propId} · ${p.categoria||'Geral'} · ${p.criadoEm||'—'}
+            ${p.obs?` · <em>${p.obs}</em>`:''}
+          </div>
+        </div>
+        <div style="font-weight:800;font-size:15px;color:var(--text)">${fmt(p.valor)}</div>
+        <span style="font-size:11px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;background:${statusColor}22">${statusLabel}</span>`;
+      // Comprovante
+      if (p.comprovante) {
+        const verBtn = document.createElement('button'); verBtn.className = 'btn btn-outline btn-xs'; verBtn.innerHTML = '📎 Ver';
+        verBtn.onclick = () => {
+          const overlay = document.createElement('div'); overlay.className = 'modal-bg'; overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+          const box = document.createElement('div'); box.style.cssText = 'background:#fff;border-radius:12px;padding:16px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:12px';
+          const closeBtn = document.createElement('button'); closeBtn.className='btn btn-ghost btn-sm'; closeBtn.textContent='✕ Fechar'; closeBtn.onclick=()=>overlay.remove();
+          const hdr=document.createElement('div'); hdr.style.cssText='display:flex;justify-content:space-between'; hdr.innerHTML=`<strong>${p.descricao}</strong>`; hdr.appendChild(closeBtn);
+          const content = document.createElement('div'); content.style.cssText='overflow:auto;border-radius:8px;border:1px solid var(--border)';
+          if(p.comprovante.startsWith('data:application/pdf')||p.comprovante.startsWith('data:application/octet')){const iframe=document.createElement('iframe');iframe.src=p.comprovante;iframe.style.cssText='width:75vw;height:75vh;border:none';content.appendChild(iframe);}
+          else{const img=document.createElement('img');img.src=p.comprovante;img.style.cssText='max-width:75vw;max-height:75vh;display:block';content.appendChild(img);}
+          box.append(hdr,content); overlay.appendChild(box); document.body.appendChild(overlay);
+        };
+        row.appendChild(verBtn);
+      }
+      // Ações de aprovação
+      if (showActions && p.status === 'pendente') {
+        const aprovBtn = document.createElement('button'); aprovBtn.className = 'btn btn-success btn-sm'; aprovBtn.innerHTML = '✓ Aprovar';
+        aprovBtn.onclick = async () => {
+          p.status = 'aprovado'; p.aprovadoEm = new Date().toISOString().slice(0,10);
+          await savePagamentos(pags); renderPagamentos(main); renderSidebar(); toast('Pagamento aprovado');
+        };
+        const rejBtn = document.createElement('button'); rejBtn.className = 'btn btn-danger btn-sm'; rejBtn.innerHTML = '✕ Rejeitar';
+        rejBtn.onclick = async () => {
+          const motivo = prompt('Motivo da rejeição (opcional):');
+          p.status = 'rejeitado'; p.motivoRejeicao = motivo||''; p.rejeitadoEm = new Date().toISOString().slice(0,10);
+          await savePagamentos(pags); renderPagamentos(main); renderSidebar(); toast('Pagamento rejeitado');
+        };
+        row.append(aprovBtn, rejBtn);
+      }
+      // Editar/excluir (apenas pendentes)
+      if (p.status === 'pendente') {
+        const editBtn = document.createElement('button'); editBtn.className = 'btn btn-ghost btn-xs'; editBtn.innerHTML = '✏';
+        editBtn.onclick = () => openPagamentoModal(p, () => renderPagamentos(main));
+        const delBtn = document.createElement('button'); delBtn.className = 'btn btn-ghost btn-xs'; delBtn.innerHTML = '×';
+        delBtn.onclick = async () => { if(!confirm('Remover?')) return; const i=pags.indexOf(p); pags.splice(i,1); await savePagamentos(pags); renderPagamentos(main); renderSidebar(); };
+        row.append(editBtn, delBtn);
+      }
+      body.appendChild(row);
+    }
+    main.appendChild(card);
+  };
+
+  renderSection('⏳ Aguardando aprovação', pendentes, true);
+  renderSection('✓ Aprovados', aprovados, false);
+  renderSection('✕ Rejeitados', rejeitados, false);
+
+  if (!pags.length) {
+    const empty = document.createElement('div'); empty.className = 'card';
+    empty.innerHTML = '<div class="card-body"><div class="empty"><div class="ei">💳</div><div class="et">Nenhum pagamento registrado ainda</div><div class="es">Clique em "+ Registrar pagamento" para começar</div></div></div>';
+    main.appendChild(empty);
+  }
+}
+
+async function openPagamentoModal(pag, cb) {
+  const isEdit = !!pag;
+  if (!pag) pag = { id: 'pag_'+Date.now(), descricao:'', propId:'', categoria:'Condomínio', valor:0, obs:'', comprovante:null, status:'pendente', criadoEm: new Date().toISOString().slice(0,10) };
+  const modal = document.createElement('div'); modal.className = 'modal-bg';
+  const cats = ['Condomínio','Energia','Gás','Água','Internet','IPTU','Manutenção','Taxa Airbnb','Taxa Imobiliária','Seguro','Jardineiro','Outros'];
+  modal.innerHTML = `<div class="modal" style="max-width:520px">
+    <div class="modal-title">${isEdit?'Editar':'Registrar'} Pagamento</div>
+    <div class="fg"><label class="fl">Descrição *</label><input id="pd" class="fi" value="${pag.descricao}" placeholder="Ex: Condomínio Juvevê maio/2026"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Imóvel *</label><select id="pp" class="fi">${PROPS.map(p=>`<option value="${p.id}" ${pag.propId===p.id?'selected':''}>${p.icon} ${p.name}</option>`).join('')}</select></div>
+      <div class="fg"><label class="fl">Categoria</label><select id="pcat" class="fi">${cats.map(c=>`<option ${pag.categoria===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Valor (R$) *</label><input id="pv" class="fi" type="number" step="0.01" value="${pag.valor||''}"></div>
+      <div class="fg"><label class="fl">Referência</label><input id="pref" class="fi" value="${pag.referencia||''}" placeholder="Mai/2026, nº boleto..."></div>
+    </div>
+    <div class="fg"><label class="fl">Observação</label><input id="po" class="fi" value="${pag.obs||''}" placeholder="Instruções, link, número do boleto..."></div>
+    <div class="fg" id="comp-area"><label class="fl">Comprovante / Boleto</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="up-chip${pag.comprovante?' has-file':''}" id="comp-chip" style="cursor:pointer">${pag.comprovante?'📎 Anexado — clique para substituir':'📎 Anexar arquivo'}</div>
+        ${pag.comprovante?'<span style="font-size:11px;color:var(--text-soft)">arquivo salvo</span>':''}
+      </div>
+      <input type="file" id="comp-fi" accept="image/*,.pdf" style="display:none">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-outline" onclick="this.closest('.modal-bg').remove()">Cancelar</button>
+      <button class="btn btn-primary" id="sv-pag">💾 ${isEdit?'Salvar alterações':'Registrar para aprovação'}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  const compFi = modal.querySelector('#comp-fi');
+  const compChip = modal.querySelector('#comp-chip');
+  compChip.onclick = () => compFi.click();
+  compFi.onchange = () => {
+    const f = compFi.files[0]; if(!f) return;
+    if(f.size>5*1024*1024){toast('Arquivo > 5MB','error');return;}
+    const reader = new FileReader();
+    reader.onload = e => { pag.comprovante = e.target.result; compChip.className='up-chip has-file'; compChip.textContent='📎 Anexado ✓'; };
+    reader.readAsDataURL(f);
+  };
+  modal.querySelector('#sv-pag').onclick = async () => {
+    const desc = modal.querySelector('#pd').value.trim();
+    const propId = modal.querySelector('#pp').value;
+    const valor = parseFloat(modal.querySelector('#pv').value)||0;
+    if (!desc) { toast('Descrição obrigatória','error'); return; }
+    if (!propId) { toast('Selecione o imóvel','error'); return; }
+    if (!valor) { toast('Informe o valor','error'); return; }
+    pag.descricao = desc; pag.propId = propId; pag.categoria = modal.querySelector('#pcat').value;
+    pag.valor = valor; pag.obs = modal.querySelector('#po').value; pag.referencia = modal.querySelector('#pref').value;
+    const all = await getPagamentos();
+    const idx = all.findIndex(x=>x.id===pag.id);
+    if (idx>=0) all.splice(idx,1,pag); else all.push(pag);
+    await savePagamentos(all); modal.remove(); cb(); renderSidebar(); toast(isEdit?'Pagamento atualizado':'Pagamento registrado para aprovação');
+  };
+}
+
+// ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
 async function renderConfig(main) {
@@ -2809,7 +3021,7 @@ async function renderConfig(main) {
       extrato:await ls.get(SK.extrato), ficha:await ls.get(SK.ficha),
       contatos:await ls.get(SK.contatos), reservas:await ls.get(SK.reservas), seguros:await ls.get(SK.seguros),
       reajuste:await ls.get(SK.reajuste), funil:await ls.get(SK.funil), responsavel:await ls.get(SK.responsavel),
-      props:await ls.get(SK.props), at:new Date().toISOString()
+      props:await ls.get(SK.props), pagamentos:await ls.get(SK.pagamentos), at:new Date().toISOString()
     };
     const a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
@@ -2820,8 +3032,8 @@ async function renderConfig(main) {
   const iInp=document.createElement('input'); iInp.type='file'; iInp.accept='.json'; iInp.style.display='none';
   iInp.onchange=()=>{const f=iInp.files[0];if(!f)return;const r=new FileReader();r.onload=async e=>{try{
     const d=JSON.parse(e.target.result);
-    const keys=['pipeline','docs','agenda','extrato','ficha','contatos','reservas','seguros','reajuste','funil','responsavel','props'];
-    const skMap={pipeline:SK.pipeline,docs:SK.docs,agenda:SK.agenda,extrato:SK.extrato,ficha:SK.ficha,contatos:SK.contatos,reservas:SK.reservas,seguros:SK.seguros,reajuste:SK.reajuste,funil:SK.funil,responsavel:SK.responsavel,props:SK.props};
+    const keys=['pipeline','docs','agenda','extrato','ficha','contatos','reservas','seguros','reajuste','funil','responsavel','props','pagamentos'];
+    const skMap={pipeline:SK.pipeline,docs:SK.docs,agenda:SK.agenda,extrato:SK.extrato,ficha:SK.ficha,contatos:SK.contatos,reservas:SK.reservas,seguros:SK.seguros,reajuste:SK.reajuste,funil:SK.funil,responsavel:SK.responsavel,props:SK.props,pagamentos:SK.pagamentos};
     for(const k of keys){if(d[k]) await ls.set(skMap[k],d[k]);}
     if(d.props) await loadUserProps();
     toast('Backup importado com sucesso'); renderSidebar(); renderMain();
