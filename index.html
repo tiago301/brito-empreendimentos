@@ -1036,9 +1036,13 @@ async function getVencimentos(diasAnte=7) {
   const hoje=new Date(); const alertas=[];
   for(const m of PROPS) {
     if(!m.custos) continue;
-    for(const c of m.custos.filter(x=>x.tipo!=='info'&&x.vencDia)) {
-      const dias=c.vencDia-hoje.getDate();
-      if(dias>=0&&dias<=diasAnte) alertas.push({prop:m,custo:c,dias,urgente:dias<=2});
+    const ficha = await getFicha(m.id);
+    for(const c of m.custos.filter(x=>x.tipo!=='info'&&x.vencDia!==null)) {
+      const savedDia = ficha['venc_'+c.id];
+      const vencDia = (savedDia !== undefined && savedDia !== null) ? savedDia : c.vencDia;
+      if (!vencDia) continue;
+      const dias=vencDia-hoje.getDate();
+      if(dias>=0&&dias<=diasAnte) alertas.push({prop:m,custo:{...c,vencDia},dias,urgente:dias<=2});
     }
   }
   // Documentos com validade vencendo
@@ -1550,6 +1554,43 @@ async function renderPropFicha(main, meta) {
   body.appendChild(sAq);
 
   main.appendChild(card);
+
+  // ── Vencimentos Recorrentes ──
+  const custosRec = (meta.custos || []).filter(c => c.recorrente && c.tipo !== 'info' && c.vencDia !== undefined);
+  if (custosRec.length) {
+    const vCard = document.createElement('div'); vCard.className = 'card';
+    vCard.innerHTML = `<div class="card-hdr"><div class="card-title">📅 Vencimentos Recorrentes</div><div class="card-sub">Dia do mês para gerar alertas automáticos</div></div><div class="card-body"></div>`;
+    const vBody = vCard.querySelector('.card-body');
+    const vGrid = document.createElement('div'); vGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px';
+    for (const c of custosRec) {
+      const key = 'venc_' + c.id;
+      const saved = ficha[key] !== undefined ? ficha[key] : c.vencDia;
+      const fg = document.createElement('div'); fg.className = 'fg';
+      fg.innerHTML = `<label class="fl" style="font-size:12px">${c.label}</label>`;
+      const wrap = document.createElement('div'); wrap.style.cssText = 'display:flex;align-items:center;gap:6px';
+      const inp = document.createElement('input'); inp.type = 'number'; inp.className = 'fi'; inp.min = '1'; inp.max = '31';
+      inp.style.cssText = 'width:70px;text-align:center';
+      inp.value = saved !== null ? saved : '';
+      inp.placeholder = '—';
+      inp.title = 'Dia do vencimento (1–31)';
+      const lbl = document.createElement('span'); lbl.style.cssText = 'font-size:11px;color:var(--text-soft)'; lbl.textContent = 'todo mês';
+      inp.onchange = async () => {
+        const v = parseInt(inp.value);
+        ficha[key] = (!inp.value || isNaN(v)) ? null : Math.max(1, Math.min(31, v));
+        await saveFicha(meta.id, ficha);
+        // Atualiza vencDia no objeto PROPS em memória para alertas imediatos
+        const pm = PROPS.find(p => p.id === meta.id);
+        if (pm && pm.custos) { const cm = pm.custos.find(x => x.id === c.id); if (cm) cm.vencDia = ficha[key]; }
+        toast('Vencimento salvo');
+      };
+      wrap.append(inp, lbl); fg.appendChild(wrap); vGrid.appendChild(fg);
+    }
+    vBody.appendChild(vGrid);
+    const hint = document.createElement('div'); hint.style.cssText = 'margin-top:12px;font-size:11px;color:var(--text-soft)';
+    hint.textContent = 'ℹ️ Esses dias geram alertas automáticos na Central de Alertas quando o vencimento se aproxima.';
+    vBody.appendChild(hint);
+    main.appendChild(vCard);
+  }
 }
 
 // ─── PIPELINE POR IMÓVEL ───
